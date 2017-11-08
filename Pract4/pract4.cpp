@@ -1,16 +1,17 @@
 #include <iostream>
+#ifdef __GNUC__
+#include <GL/freeglut.h>
+#else
 #include <GL\freeglut.h>
+#endif
 #include "Utilidades.h"
 
 #define PROYECTO "Estrella 3D"
 
-const double CAM_X = 5.0;
+const double CAM_X = 7.0;
 const double CAM_Y = 5.0;
-const double CAM_Z = 5.0;
-
-//1. La cámara se coloca en cualquier posición mirando hacia el origen.
-//2. La esfera se coloca en el origen.
-//3. El fov de la cámara será tal que la esfera ocupe toda la cámara (dependerá de la distancia de la cámara al origen y del radio de la esfera).
+const double CAM_Z = 2.0;
+const double ASPECT = 1.0;
 
 using namespace std;
 
@@ -53,7 +54,8 @@ void display() {
 }
 
 void reshape(GLint w, GLint h) {
-	float s = min(h, w);
+	//float s = min(h, w);
+	GLint s = h;
 	glViewport(w / 2 - s / 2, 0, s, s);
 }
 
@@ -61,7 +63,7 @@ int main(int argc, char** argv) {
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(400, 400);
+	glutInitWindowSize(400, 200);
 	glutCreateWindow(PROYECTO);
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
@@ -75,13 +77,11 @@ int main(int argc, char** argv) {
 	glLoadIdentity();
 
 	//0.5 es el radio de la esfera.
-	gluPerspective(deg(atan(0.5 / sqrt(CAM_X * CAM_X + CAM_Y * CAM_Y + CAM_Z * CAM_Z))) * 2, 1, 1, 100);
+	gluPerspective(deg(asin(0.5 / sqrt(CAM_X * CAM_X + CAM_Y * CAM_Y + CAM_Z * CAM_Z))) * 2, ASPECT, 1, 100);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(CAM_X, CAM_Y, CAM_Z, 0.0, 0.0, 0.0, 0.0, 1., 0.0);
-
-	//glViewport(100, 100, 300, 300);
+	gluLookAt(CAM_X, CAM_Y, CAM_Z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
 	//CALCULAR COORDENADAS
 

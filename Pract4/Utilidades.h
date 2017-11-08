@@ -11,7 +11,11 @@
 #include <cmath>
 #include <GL/freeglut.h>
 #include <GL/glext.h>
+#ifdef __GNUC__
+#include <FreeImage.h>
+#else
 #include <freeimage/FreeImage.h>
+#endif
 
 using namespace std;
 
