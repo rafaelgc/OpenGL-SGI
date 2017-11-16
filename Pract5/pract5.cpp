@@ -27,12 +27,20 @@ void setupTime() {
     time_t ti;
     time(&ti);
 	
-	tm t;
-	localtime_s(&t, &ti);
+	#ifdef __GNUC__
+	    tm *t = localtime(&ti);
     
-    hour = t.tm_hour;
-    minute = t.tm_min;
-    sec = t.tm_sec;
+        hour = t->tm_hour;
+        minute = t->tm_min;
+        sec = t->tm_sec;
+	#else
+	    tm t;
+    	localtime_s(&t, &ti);
+    
+        hour = t.tm_hour;
+        minute = t.tm_min;
+        sec = t.tm_sec;
+	#endif
     
 }
 
