@@ -17,10 +17,21 @@ using namespace std;
 
 static GLuint triangulo;
 
-GLdouble angle = 0.f;
+GLdouble angleCircle = 0.f, angleSec = 0.f;
 
-GLdouble angleCircle = 0.f;
-GLdouble angleSec = 0.f;
+//Hora actual.
+int sec = 0, minute = 0, hour = 0;
+
+void setupTime() {
+    time_t ti;
+    time(&ti);
+    tm* t = localtime(&ti);
+    
+    hour = t->tm_hour;
+    minute = t->tm_min;
+    sec = t->tm_sec;
+    
+}
 
 void loop() {
 	static int start = glutGet(GLUT_ELAPSED_TIME);
@@ -28,11 +39,7 @@ void loop() {
 
 	double deltaTime = (now - start) / 1000.0;
 	
-	//std::cout << deltaTime << std::endl;
-
-	angle += 10.0 * deltaTime;
 	angleCircle += 180 * deltaTime;
-
 	angleSec += 6 * deltaTime;
 
 	glutPostRedisplay();
@@ -40,31 +47,38 @@ void loop() {
 	start = now;
 }
 
-void drawTriangles(GLfloat x, GLfloat y, GLfloat angle) {
-	glPushMatrix();
-	glTranslatef(x, y, 0.0);
-	glScalef(0.5, 0.5, 0.5);
-
-	const unsigned int N = 6;
-
-	for (unsigned int i = 0; i < N; i++) {
-		glRotatef(180.0 / N, 0.0, 1.0, 0.0);
-		glColor3f((float)0, (float)i / N, (float)i / N);
-		glCallList(triangulo);
-	}
-
-	glRotatef(180.f, 0.f, 0.f, 1.f);
-	for (unsigned int i = 0; i < N; i++) {
-		glRotatef(180.0 / N, 0.0, 1.0, 0.0);
-		glColor3f((float)i / N, (float)i / N, (float)0);
-		glCallList(triangulo);
-	}
-
-	glPopMatrix();
+void secFunc(int millis) {
+    //sec=1;
+    sec++;
+    if (sec == 60) {
+        sec = 0;
+        minute++;
+        if (minute == 60) {
+            minute = 0;
+            hour++;
+            if (hour == 12) {
+                hour = 0;
+            }
+        }
+    }
+    std::cout << hour << ":" << minute << ":" << sec << std::endl;
+    
+    glutTimerFunc(1000, secFunc, 0);
 }
 
 void drawCircle(GLfloat radius) {
 	glBegin(GL_LINE_LOOP);
+	for (int i = 0; i <= 300; i++) {
+		double angle = 2 * PI * i / 300;
+		double x = cos(angle);
+		double y = sin(angle);
+		glVertex2d(radius * x, radius * y);
+	}
+	glEnd();
+}
+
+void drawSolidCircle(GLfloat radius) {
+	glBegin(GL_POLYGON);
 	for (int i = 0; i <= 300; i++) {
 		double angle = 2 * PI * i / 300;
 		double x = cos(angle);
@@ -91,6 +105,7 @@ void drawGyroscope(GLfloat radius) {
 	drawCircle(radius);
 	glPopMatrix();
 
+    /// Círculo 3
 	glColor3f(0.5, .5, 0.0);
 	glPushMatrix();
 	glRotatef(angleCircle, 1.f, 1.f, 0.f);
@@ -100,16 +115,102 @@ void drawGyroscope(GLfloat radius) {
 	glPopMatrix();
 }
 
+void drawSpheres(GLfloat radius) {
+	/// MOVIMIENTO CONTINUO
+
+	/// Circulo 2
+	glColor3f(0.0, .5, 0.0);
+	glPushMatrix();
+	glRotatef(90, 1.f, 0.f, 0.f);
+	drawCircle(radius);
+	
+	glRotatef(45 + angleCircle, 0.f, 0.f, 1.f);
+	glTranslatef(radius, 0.f, 0.f);
+	glutSolidSphere(0.01, 20, 20);
+	
+	glPopMatrix();
+
+    // Círculo 3
+	glColor3f(0.5, .5, 0.0);
+	glPushMatrix();
+	//glRotatef(angleCircle, 1.f, 1.f, 0.f);
+	glRotatef(45.f, 0.f, 0.f, 1.f);
+	glRotatef(90.f, 1.f, 0.f, 0.f);
+	drawCircle(radius);
+	
+	glRotatef(90 + angleCircle, 0.f, 0.f, 1.f);
+	glTranslatef(radius, 0.f, 0.f);
+	glutSolidSphere(0.01, 20, 20);
+	
+	glPopMatrix();
+	
+	/// Circulo 1
+	glColor3f(0.5, 0.0, 0.0);
+	glPushMatrix();
+	drawCircle(radius);
+	
+	glRotatef(angleCircle, 0.f, 0.f, 1.f);
+	glTranslatef(radius, 0.f, 0.f);
+	glutSolidSphere(0.01, 20, 20);
+	
+	glPopMatrix();
+}
+
+void drawSeconds() {
+    //BARRA SEGUNDO (CONTINUA)
+	glColor3f(0.f, 0.f, 0.f);
+	glPushMatrix();
+	glRotatef(-angleSec, 0.f, 0.f, 1.f);
+	glTranslatef(0.f, 0.1f, 0.f);
+
+	glBegin(GL_POLYGON);
+	glVertex2f(-0.01, 0);
+	glVertex2f(0.01, 0);
+	glVertex2f(0.0, 0.4);
+	glEnd();
+	glPopMatrix();
+}
+
+void drawMinutes() {
+    //BARRA MINUTOS (DISCRETA)
+	glColor3f(0.3f, 0.3f, 0.3f);
+	glPushMatrix();
+	glRotatef(-minute * 6, 0.f, 0.f, 1.f);
+	glTranslatef(0.f, 0.25f, 0.f);
+
+	glBegin(GL_POLYGON);
+	glVertex2f(-0.01, 0);
+	glVertex2f(0.01, 0);
+	glVertex2f(0.0, 0.25);
+	glEnd();
+	glPopMatrix();
+}
+
+void drawHours() {
+    //BARRA HORAS (CONTINUO)
+	glColor3f(0.5f, 0.5f, 0.5f);
+	glPushMatrix();
+	glRotatef(-hour * 30 - minute / 60.f * 30, 0.f, 0.f, 1.f);
+	glTranslatef(0.f, 0.4f, 0.f);
+
+	glBegin(GL_POLYGON);
+	glVertex2f(-0.01, 0);
+	glVertex2f(0.01, 0);
+	glVertex2f(0.0, 0.1);
+	glEnd();
+	glPopMatrix();
+}
+
 void display() {
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glColor4f(0.0, 0.3, 0.9, 0.1f);
-
-	glPushMatrix();
-	glRotatef(angle, 0.f, 1.f, 0.f);
-	//glutWireSphere(0.5, 15, 15);
-	glPopMatrix();
+	
+	//AGUJAS
+	drawSeconds();
+	drawMinutes();
+	drawHours();
+	
+	drawSpheres(0.1);
 
 	///MARCAS HORAS
 	glColor3f(0.0, .0, 0.6);
@@ -118,7 +219,6 @@ void display() {
 
 		glRotatef(30 * i, 0.f, 0.f, 1.f);
 		glTranslatef(0.f, 0.5f - 0.02f, 0.f);
-		//drawCircle(0.02);
 		drawGyroscope(0.02);
 
 		glPopMatrix();
@@ -126,6 +226,15 @@ void display() {
 
 	glColor3f(0.0, 0.6, 0.6);
 	for (unsigned int i = 0; i < 60; i++) {
+	
+	    if (i == sec) {
+	        glPushMatrix();
+	        glRotatef(360 - 6 * i, 0.f, 0.f, 1.f);
+    		glTranslatef(0.f, 0.5f - (i % 5 == 0 ? 0.02 : 0.01), 0.f);
+	        glutSolidSphere( i % 5 == 0 ? 0.02 : 0.01, 20, 20);
+	        glPopMatrix();
+	    }
+	
 		if (i % 5 == 0) continue;
 		glPushMatrix();
 
@@ -136,22 +245,6 @@ void display() {
 		glPopMatrix();
 	}
 
-	//SEGUNDO
-	glColor3f(0.f, 0.f, 0.f);
-	glPushMatrix();
-	glRotatef(-angleSec, 0.f, 0.f, 1.f);
-	glTranslatef(0.f, 0.1f, 0.f);
-
-	glBegin(GL_POLYGON);
-	glVertex2f(-0.01, 0);
-	glVertex2f(0.01, 0);
-	glVertex2f(0.01, 0.4);
-	glVertex2f(-0.01, 0.4);
-	glEnd();
-	glPopMatrix();
-	//drawTriangles(0.0, 0.0, 0);
-
-	//glFlush();
 	glutSwapBuffers();
 
 }
@@ -172,6 +265,8 @@ int main(int argc, char** argv) {
 	glutReshapeFunc(reshape);
 	glutIdleFunc(loop);
 	cout << PROYECTO << " en marcha" << endl;
+	
+	glutTimerFunc(1000, secFunc, 0);
 
 	glEnableClientState(GL_VERTEX_ARRAY | GL_COLOR_ARRAY);
 	glEnable(GL_DEPTH_TEST | GL_BLEND);
@@ -189,39 +284,10 @@ int main(int argc, char** argv) {
 	glLoadIdentity();
 	gluLookAt(CAM_X, CAM_Y, CAM_Z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
-	//CALCULAR COORDENADAS
-
-	GLfloat v[12];
-
-	for (unsigned int i = 0; i < 6; i++) {
-		float rad = 3.1415 / 3 + i * PI / 3;
-		float x = sin(rad);
-		float y = cos(rad);
-
-		v[2 * i] = x;
-		v[2 * i + 1] = y;
-	}
-
-	//CONFIGURAR TRIANGULO
-	triangulo = glGenLists(1);
-
-	glNewList(triangulo, GL_COMPILE);
-
-	glBegin(GL_TRIANGLE_STRIP);
-
-	for (unsigned int i = 0; i < 6; i += 2) {
-		//Interior
-		glVertex2f(v[2 * i] * 0.7, v[2 * i + 1] * 0.7);
-
-		//Exterior
-		glVertex2f(v[2 * i], v[2 * i + 1]);
-	}
-	glVertex2f(v[0] * 0.7, v[1] * 0.7);
-	glVertex2f(v[0], v[1]);
-
-	glEnd();
-
-	glEndList();
+    //CONFIGURAR HORA
+    setupTime();
+    
+    angleSec = (sec / 60.f) * 360;
 
 	glutMainLoop();
 
