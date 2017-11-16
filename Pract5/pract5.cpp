@@ -8,8 +8,8 @@
 
 #define PROYECTO "Reloj analógico"
 
-const double CAM_X = 0.0;
-const double CAM_Y = 0.0;
+const double CAM_X = 5.0;
+const double CAM_Y = 5.0;
 const double CAM_Z = 5.0;
 const double ASPECT = 1.0;
 
@@ -68,8 +68,8 @@ void secFunc(int millis) {
 
 void drawCircle(GLfloat radius) {
 	glBegin(GL_LINE_LOOP);
-	for (int i = 0; i <= 300; i++) {
-		double angle = 2 * PI * i / 300;
+	for (int i = 0; i <= 20; i++) {
+		double angle = 2 * PI * i / 20;
 		double x = cos(angle);
 		double y = sin(angle);
 		glVertex2d(radius * x, radius * y);
@@ -205,6 +205,9 @@ void display() {
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+	//glColor3f(0,0,0);
+	//glutSolidSphere(0.5, 20,20);
+	
 	//AGUJAS
 	drawSeconds();
 	drawMinutes();
@@ -218,7 +221,7 @@ void display() {
 		glPushMatrix();
 
 		glRotatef(30 * i, 0.f, 0.f, 1.f);
-		glTranslatef(0.f, 0.5f - 0.02f, 0.f);
+		glTranslatef(0.f, 0.5f - 0.04f, 0.f);
 		drawGyroscope(0.02);
 
 		glPopMatrix();
@@ -230,8 +233,8 @@ void display() {
 	    if (i == sec) {
 	        glPushMatrix();
 	        glRotatef(360 - 6 * i, 0.f, 0.f, 1.f);
-    		glTranslatef(0.f, 0.5f - (i % 5 == 0 ? 0.02 : 0.01), 0.f);
-	        glutSolidSphere( i % 5 == 0 ? 0.02 : 0.01, 20, 20);
+    		glTranslatef(0.f, 0.5f - (i % 5 == 0 ? 0.04 : 0.02), 0.f);
+	        glutSolidSphere( (i % 5 == 0 ? 0.02 : 0.01) * 0.90, 20, 20);
 	        glPopMatrix();
 	    }
 	
@@ -239,7 +242,7 @@ void display() {
 		glPushMatrix();
 
 		glRotatef(6 * i, 0.f, 0.f, 1.f);
-		glTranslatef(0.f, 0.5f - 0.01f, 0.f);
+		glTranslatef(0.f, 0.5f - 0.02f, 0.f);
 		drawCircle(0.01);
 
 		glPopMatrix();
@@ -269,9 +272,7 @@ int main(int argc, char** argv) {
 	glutTimerFunc(1000, secFunc, 0);
 
 	glEnableClientState(GL_VERTEX_ARRAY | GL_COLOR_ARRAY);
-	glEnable(GL_DEPTH_TEST | GL_BLEND);
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST);
 
 	//CONFIGURAR CAMARA
 	glMatrixMode(GL_PROJECTION);
