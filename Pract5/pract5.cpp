@@ -52,25 +52,6 @@ void loop() {
 	start = now;
 }
 
-void secFunc(int millis) {
-    //sec=1;
-    sec++;
-    if (sec == 60) {
-        sec = 0;
-        minute++;
-        if (minute == 60) {
-            minute = 0;
-            hour++;
-            if (hour == 12) {
-                hour = 0;
-            }
-        }
-    }
-    std::cout << hour << ":" << minute << ":" << sec << std::endl;
-    
-    glutTimerFunc(1000, secFunc, 0);
-}
-
 void drawCircle(GLfloat radius) {
 	glBegin(GL_LINE_LOOP);
 	for (int i = 0; i <= 20; i++) {
@@ -120,7 +101,7 @@ void drawGyroscope(GLfloat radius) {
 	glPopMatrix();
 }
 
-void drawSpheres(GLfloat radius) {
+void drawCircles(GLfloat radius) {
 	/// MOVIMIENTO CONTINUO
 
 	/// Circulo 2
@@ -210,15 +191,12 @@ void display() {
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	//glColor3f(0,0,0);
-	//glutSolidSphere(0.5, 20,20);
-	
 	//AGUJAS
 	drawSeconds();
 	drawMinutes();
 	drawHours();
 	
-	drawSpheres(0.1);
+	drawCircles(0.1);
 
 	///MARCAS HORAS
 	glColor3f(0.0, .0, 0.6);
@@ -273,8 +251,6 @@ int main(int argc, char** argv) {
 	glutReshapeFunc(reshape);
 	glutIdleFunc(loop);
 	cout << PROYECTO << " en marcha" << endl;
-	
-	glutTimerFunc(1000, secFunc, 0);
 
 	glEnableClientState(GL_VERTEX_ARRAY | GL_COLOR_ARRAY);
 	glEnable(GL_DEPTH_TEST);
