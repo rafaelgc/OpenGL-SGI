@@ -4,6 +4,7 @@
 #else
 #include <GL\freeglut.h>
 #endif
+#include <ctime>
 #include "Utilidades.h"
 
 #define PROYECTO "Reloj analógico"
@@ -25,17 +26,21 @@ int sec = 0, minute = 0, hour = 0;
 void setupTime() {
     time_t ti;
     time(&ti);
-    tm* t = localtime(&ti);
+	
+	tm t;
+	localtime_s(&t, &ti);
     
-    hour = t->tm_hour;
-    minute = t->tm_min;
-    sec = t->tm_sec;
+    hour = t.tm_hour;
+    minute = t.tm_min;
+    sec = t.tm_sec;
     
 }
 
 void loop() {
 	static int start = glutGet(GLUT_ELAPSED_TIME);
 	int now = glutGet(GLUT_ELAPSED_TIME);
+
+	setupTime();
 
 	double deltaTime = (now - start) / 1000.0;
 	
