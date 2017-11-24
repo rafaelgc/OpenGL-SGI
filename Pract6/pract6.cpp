@@ -63,10 +63,10 @@ void Game::loop(float deltaTime) {
 
 void Game::onKeyPressed(unsigned char k, int x, int y) {
 	if (k == 'w') {
-		module += 0.1;
+		module += 0.5;
 	}
 	else if (k == 's') {
-		module += 0.1;
+		module += 0.5;
 	}
 }
 
