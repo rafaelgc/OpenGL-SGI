@@ -56,7 +56,7 @@ void init() {
     angle = 90.f;
     module = 0.f;
 
-    
+    #ifndef SGI_DEBUG
     camX = 0.f;
     camY = 1.f;
     camZ = 0.f;
@@ -64,6 +64,15 @@ void init() {
     lookAtX = 0.f;
     lookAtY = 1.f;
     lookAtZ = -1.f;
+    #else
+    camX = 20.f;
+    camY = 40.f;
+    camZ = 0.f;
+
+    lookAtX = 0.f;
+    lookAtY = 1.f;
+    lookAtZ = 0.f;
+    #endif
     
     track = glGenLists(1);
     
@@ -76,21 +85,21 @@ void init() {
                     TRACK_WIDTH, 0, TRACK_LONG,
                     0, 0, TRACK_LONG};
     
-    quad(&p[0],&p[3],&p[6],&p[9], 50, 50);
+    //quad(&p[0],&p[3],&p[6],&p[9], 50, 50);
     glTranslatef(TRACK_GAP + TRACK_WIDTH, 0.0, 0.0);
-    quad(&p[0],&p[3],&p[6],&p[9], 50, 50);
+    //quad(&p[0],&p[3],&p[6],&p[9], 50, 50);
     glTranslatef(-(TRACK_GAP + TRACK_WIDTH), 0.0, 0.0);
     
     glTranslatef(TRACK_GAP / 2 + TRACK_WIDTH, 0, TRACK_LONG);
 
-    drawCurve(20);
+    //drawCurve(2);
     
     glTranslatef(-(TRACK_GAP / 2 + TRACK_WIDTH), 0, -TRACK_LONG);
     
     glTranslatef(TRACK_GAP / 2 + TRACK_WIDTH, 0, 0);
     glRotatef(180, 0, 1, 0);
     
-    drawCurve(20);
+    drawCurve(5);
     
     glTranslatef(-(TRACK_GAP / 2 + TRACK_WIDTH), 0, 0);
     
@@ -99,33 +108,35 @@ void init() {
 
 void drawCurve(unsigned int Q) {
     GLfloat p[12];
+    glBegin(GL_QUADS);
     for (int i = 1; i <= Q; i++) {
         float deg = i * (180 / Q);
         float prevDeg = (i - 1) * (180 / Q);
         
-        p[0] = TRACK_GAP / 2 * cos(rad(deg));
+        p[0] = (TRACK_GAP / 2) * cos(rad(deg));
         p[1] = 0.f;
-        p[2] = TRACK_GAP / 2 * sin(rad(deg));
+        p[2] = (TRACK_GAP / 2) * sin(rad(deg));
         
         p[3] = (TRACK_GAP / 2 + TRACK_WIDTH) * cos(rad(deg));
         p[4] = 0.f;
         p[5] = (TRACK_GAP / 2 + TRACK_WIDTH) * sin(rad(deg));
         
-        p[9] = TRACK_GAP / 2 * cos(rad(prevDeg));
+        p[9] = (TRACK_GAP / 2) * cos(rad(prevDeg));
         p[10] = 0.f;
-        p[11] = TRACK_GAP / 2 * sin(rad(prevDeg));
+        p[11] = (TRACK_GAP / 2) * sin(rad(prevDeg));
         
         p[6] = (TRACK_GAP / 2 + TRACK_WIDTH) * cos(rad(prevDeg));
         p[7] = 0.f;
         p[8] = (TRACK_GAP / 2 + TRACK_WIDTH) * sin(rad(prevDeg));
         
-        glVertex3fv(&p[0]);
+        /*glVertex3fv(&p[0]);
         glVertex3fv(&p[3]);
         glVertex3fv(&p[6]);
-        glVertex3fv(&p[9]);
+        glVertex3fv(&p[9]);*/
         
         quad(&p[0],&p[3],&p[6],&p[9]);
     }
+    glEnd();
 }
 
 void draw() {
@@ -137,7 +148,6 @@ void draw() {
     glPushMatrix();
     glTranslatef(0, 0, 5);
     glutSolidSphere(1, 20, 20);
-    glCallList(track);
     glPopMatrix();
     
     glPushMatrix();
@@ -250,7 +260,7 @@ int main(int argc, char** argv) {
     glEnableClientState(GL_VERTEX_ARRAY | GL_COLOR_ARRAY);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_POINT_SMOOTH);
-    glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
     glShadeModel (GL_SMOOTH);
     
 
@@ -311,7 +321,7 @@ int main(int argc, char** argv) {
     GLfloat mat_color[] = {1,0,0};
     
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    glLightfv(GL_LIGHT0, GL_DIFUSE, mat_color);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, mat_color);
     
     glEnable(GL_LIGHT0);
     
