@@ -76,9 +76,9 @@ void init() {
                     TRACK_WIDTH, 0, TRACK_LONG,
                     0, 0, TRACK_LONG};
     
-    quad(&p[0],&p[3],&p[6],&p[9]);
+    quad(&p[0],&p[3],&p[6],&p[9], 50, 50);
     glTranslatef(TRACK_GAP + TRACK_WIDTH, 0.0, 0.0);
-    quad(&p[0],&p[3],&p[6],&p[9]);
+    quad(&p[0],&p[3],&p[6],&p[9], 50, 50);
     glTranslatef(-(TRACK_GAP + TRACK_WIDTH), 0.0, 0.0);
     
     glTranslatef(TRACK_GAP / 2 + TRACK_WIDTH, 0, TRACK_LONG);
@@ -133,6 +133,12 @@ void draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     ejes();
+        
+    glPushMatrix();
+    glTranslatef(0, 0, 5);
+    glutSolidSphere(1, 20, 20);
+    glCallList(track);
+    glPopMatrix();
     
     glPushMatrix();
     glTranslatef(-TRACK_WIDTH / 2, 0.f, 0.f);
@@ -141,12 +147,17 @@ void draw() {
     
     glColor3f(0.1, 0.8, 0.1);
     
-    glBegin(GL_QUADS);
+    /*glBegin(GL_QUADS);
+    glNormal3f(0,1,0);
     glVertex3f(-100,-0.1,-100);
     glVertex3f(100,-0.1,-100);
     glVertex3f(100,-0.1,100);
     glVertex3f(-100,-0.1,100);
-    glEnd();
+    glEnd();*/
+    
+    
+    //GLfloat p[12] = {100,-0.1,-100, 100,-0.1,-100, 100,-0.1,100, -100,-0.1,100};
+    //quad(&p[0],&p[3],&p[6],&p[9]);
     
     glutSwapBuffers();
     
@@ -239,6 +250,9 @@ int main(int argc, char** argv) {
     glEnableClientState(GL_VERTEX_ARRAY | GL_COLOR_ARRAY);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_POINT_SMOOTH);
+    glEnable(GL_LIGHTING);
+    glShadeModel (GL_SMOOTH);
+    
 
     //CONFIGURAR CAMARA
     glMatrixMode(GL_PROJECTION);
@@ -252,6 +266,54 @@ int main(int argc, char** argv) {
 
     init();
     cout << windowTitle << " en marcha" << endl;
+    
+    /*GLfloat A[]={0.2, 0.2, 0.2, 1.0};
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, A);
+    glEnable(GL_LIGHT0);
+    
+    GLfloat Al0[]={0.2,0.3,0.2,1.0};
+    GLfloat Dl0[]={0.5,0.7,1.0,1.0};
+    GLfloat Sl0[]={1.0,1.0,0.9,1.0};
+    
+    glLightfv(GL_LIGHT0, GL_AMBIENT, Al0);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, Dl0);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, Sl0);
+    
+    glEnable(GL_LIGHT1);
+    GLfloat posicion[]={0.0, 2.0, 5.0, 1.0};
+    glLightfv(GL_LIGHT1, GL_POSITION, posicion);
+    */
+    
+    /*GLfloat Em[]={0.5,0.5,0.5,1.0};
+    GLfloat Am[]={0.2,0.2,0.2,1.0};
+    GLfloat Dm[]={0.6,0.6,0.6,1.0};
+    GLfloat Sm[]={0.8,0.8,0.8,1.0};
+    GLfloat s=20.0;
+    glMaterialfv(GL_FRONT, GL_EMISSION, Em);
+    glMaterialfv(GL_FRONT,GL_AMBIENT,Am);
+    glMaterialfv(GL_FRONT,GL_DIFFUSE,Dm);
+    glMaterialfv(GL_FRONT,GL_SPECULAR,Sm);
+    glMaterialf(GL_FRONT, GL_SHININESS, s);
+    
+    glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
+    glEnable(GL_COLOR_MATERIAL);*/
+    
+    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat mat_shininess[] = { 100 };
+    GLfloat light_position[] = { 0.0, 1.0, 0.0, 0.0 };
+    GLfloat mat_diffuse[] = { 1.0, 0.0, 0.0, 1.0 };
+    //glClearColor (0.0, 0.0, 0.0, 0.0);
+
+    //glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    //glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    //glMaterialfv(GL_FRONT,GL_DIFFUSE,mat_diffuse);
+    
+    GLfloat mat_color[] = {1,0,0};
+    
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_DIFUSE, mat_color);
+    
+    glEnable(GL_LIGHT0);
     
     
     glutMainLoop();

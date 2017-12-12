@@ -1,0 +1,2 @@
+g++ pract3.cpp -lfreeimage -lGL -lglut -lGLU -o prueba
+
