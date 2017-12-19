@@ -6,7 +6,7 @@
 #include <GL\freeglut.h>
 #endif
 
-int keyState[KEYBOARD_BUFFER_SIZE];
+bool keyState[KEYBOARD_BUFFER_SIZE];
 
 void initKeyboard() {
     for (unsigned int i = 0; i < KEYBOARD_BUFFER_SIZE; i++) {

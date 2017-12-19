@@ -14,7 +14,7 @@ enum Key {Up, Down, Left, Right};
 
 /// Buffer para almacenar el estado de las teclas.
 const unsigned int KEYBOARD_BUFFER_SIZE = 256;
-extern int keyState[KEYBOARD_BUFFER_SIZE];
+extern bool keyState[KEYBOARD_BUFFER_SIZE];
 
 /*Inicializa los callbacks y el buffer.*/
 void initKeyboard();

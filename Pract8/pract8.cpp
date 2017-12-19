@@ -22,7 +22,7 @@ float angle, module;
 GLfloat camX, camY, camZ;
 GLfloat lookAtX, lookAtY, lookAtZ;
 
-const float FAR = 300;
+const float CAM_FAR = 300.0;
 
 
 // ATRIBUTOS DE LA VISTA
@@ -36,7 +36,7 @@ const float TRACK_LONG = 50.f;
 
 GLuint track;
 GLuint trackTex;
-const char *trackFilename = "roadAsphalt.jpg";
+const char *trackFilename = "roadAsphalt.png";
 
 /// TEXTURA DEL SUELO
 const char *grassFilename = "grass.png";
@@ -229,10 +229,10 @@ void draw() {
     
     glColor3f(0.0, 0.4, 0.0);
     glBegin(GL_QUADS);
-    glVertex3f(-FAR + camX,-0.2,-FAR + camZ);
-    glVertex3f(FAR + camX,-0.2,-FAR + camZ);
-    glVertex3f(FAR + camX,-0.2,FAR + camZ);
-    glVertex3f(-FAR + camX,-0.2,FAR + camZ);
+    glVertex3f(-CAM_FAR + camX,-0.2,-CAM_FAR + camZ);
+    glVertex3f(CAM_FAR + camX,-0.2,-CAM_FAR + camZ);
+    glVertex3f(CAM_FAR + camX,-0.2, CAM_FAR + camZ);
+    glVertex3f(-CAM_FAR + camX,-0.2, CAM_FAR + camZ);
     glEnd();
     
     //SUELO TEXTURIZADO
@@ -243,13 +243,13 @@ void draw() {
     
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0);
-    glVertex3f(-FAR,-0.1,-FAR);
+    glVertex3f(-CAM_FAR,-0.1,-CAM_FAR);
     glTexCoord2f(10, 0);
-    glVertex3f(FAR,-0.1,-FAR);
+    glVertex3f(CAM_FAR,-0.1,-CAM_FAR);
     glTexCoord2f(10, 10);
-    glVertex3f(FAR,-0.1,FAR);
+    glVertex3f(CAM_FAR,-0.1, CAM_FAR);
     glTexCoord2f(0, 10);
-    glVertex3f(-FAR,-0.1,FAR);
+    glVertex3f(-CAM_FAR,-0.1, CAM_FAR);
     glEnd();
     
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -295,11 +295,11 @@ void drawBackground() {
       float angle = rad(i * (360.0 / C));
       float prevAngle = rad((i - 1) * (360.0 / C));
       
-      float x0 = cos(prevAngle) * FAR;
-      float z0 = sin(prevAngle) * FAR;
+      float x0 = cos(prevAngle) * CAM_FAR;
+      float z0 = sin(prevAngle) * CAM_FAR;
       
-      float x1 = cos(angle) * FAR;
-      float z1 = sin(angle) * FAR;
+      float x1 = cos(angle) * CAM_FAR;
+      float z1 = sin(angle) * CAM_FAR;
       
       glTexCoord2f(prevAngle / (2 * PI), 0);
       glVertex3f(x0, 0, z0);
@@ -443,7 +443,7 @@ int main(int argc, char** argv) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(45, 1.6, 1, FAR);
+    gluPerspective(45, 1.6, 1, CAM_FAR);
 
     //glMatrixMode(GL_MODELVIEW);
     //glLoadIdentity();
