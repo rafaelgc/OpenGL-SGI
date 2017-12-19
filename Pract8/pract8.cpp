@@ -5,9 +5,11 @@
 #include <GL\freeglut.h>
 #endif
 #include <ctime>
+#include <string>
 #include "Utilidades.h"
 
-#define SGI_DEBUG
+#include "Keyboard.hpp"
+
 
 using namespace std;
 
@@ -20,11 +22,8 @@ float angle, module;
 GLfloat camX, camY, camZ;
 GLfloat lookAtX, lookAtY, lookAtZ;
 
-const float FAR = 100;
+const float FAR = 300;
 
-//Se calcula el tamaño del fondo para que el cubo
-//quede inscrito dentro de la región visible.
-const float BACKGROUND_SIZE = sin(rad(45)) * FAR;
 
 // ATRIBUTOS DE LA VISTA
 const unsigned int WIDTH = 1440, HEIGHT = 900;
@@ -36,6 +35,12 @@ const float TRACK_WIDTH = 8.f;
 const float TRACK_LONG = 50.f;
 
 GLuint track;
+GLuint trackTex;
+const char *trackFilename = "roadAsphalt.jpg";
+
+/// TEXTURA DEL SUELO
+const char *grassFilename = "grass.png";
+GLuint grassTex;
 
 /// IMAGEN DE FONDO
 const char *backgroundFilename = "background.jpg";
@@ -61,20 +66,29 @@ void draw();
  */
 void drawBackground();
 
+/**
+ * Dibuja un cartel publicitario.
+ */
 void drawAd();
 
+/**
+ * Dibuja una curva (180 grados) dividida en Q quads.
+ */
 void drawCurve(unsigned int Q);
+
+/**
+ * Dibuja toda la pista.
+ */
+void drawTrack();
 
 /**
  * Función llamada cuando se produce el evento iddle.
  */
 void loop();
 
-void onKeyPressed(unsigned char k, int x, int y);
-void onSpecialKeyPressed(int k, int x, int y);
 
 void init() {
-    windowTitle = "Interfaz de conducción";
+    windowTitle = "Circuito texturizado";
     angle = 90.f;
     module = 0.f;
 
@@ -86,37 +100,6 @@ void init() {
     lookAtX = 0.f;
     lookAtY = 1.f;
     lookAtZ = -1.f;
-    
-    track = glGenLists(1);
-    
-    glNewList(track, GL_COMPILE);
-    
-    glColor3fv(GRISOSCURO);
-    
-    GLfloat p[12] = {0, 0, 0,
-                    TRACK_WIDTH, 0, 0,
-                    TRACK_WIDTH, 0, TRACK_LONG,
-                    0, 0, TRACK_LONG};
-    
-    quad(&p[0],&p[3],&p[6],&p[9]);
-    glTranslatef(TRACK_GAP + TRACK_WIDTH, 0.0, 0.0);
-    quad(&p[0],&p[3],&p[6],&p[9]);
-    glTranslatef(-(TRACK_GAP + TRACK_WIDTH), 0.0, 0.0);
-    
-    glTranslatef(TRACK_GAP / 2 + TRACK_WIDTH, 0, TRACK_LONG);
-
-    drawCurve(20);
-    
-    glTranslatef(-(TRACK_GAP / 2 + TRACK_WIDTH), 0, -TRACK_LONG);
-    
-    glTranslatef(TRACK_GAP / 2 + TRACK_WIDTH, 0, 0);
-    glRotatef(180, 0, 1, 0);
-    
-    drawCurve(20);
-    
-    glTranslatef(-(TRACK_GAP / 2 + TRACK_WIDTH), 0, 0);
-    
-    glEndList();
     
     /*CARGA IMAGENES*/
     glGenTextures(1,&backgroundTex);
@@ -137,14 +120,43 @@ void init() {
     
     //
     
+    glGenTextures(1,&trackTex);
+    glBindTexture(GL_TEXTURE_2D, trackTex);
+    
+    loadImageFile((char*)trackFilename);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    
+    //
+    
+    glGenTextures(1,&grassTex);
+    glBindTexture(GL_TEXTURE_2D, grassTex);
+    
+    loadImageFile((char*)grassFilename);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    
+    //
+    
     glBindTexture(GL_TEXTURE_2D, 0);
+    
+    // CONSTRUIR CIRCUITO
+    
+    track = glGenLists(1);
+    
+    glNewList(track, GL_COMPILE);
+    
+    drawTrack();
+    
+    glEndList();
+    
     
 }
 
 void drawCurve(unsigned int Q) {
     GLfloat p[12];
     for (int i = 1; i <= Q; i++) {
-        float deg = i * (180 / Q);
+        float deg = i * (180.0 / Q);
         float prevDeg = (i - 1) * (180 / Q);
         
         p[0] = TRACK_GAP / 2 * cos(rad(deg));
@@ -163,68 +175,94 @@ void drawCurve(unsigned int Q) {
         p[7] = 0.f;
         p[8] = (TRACK_GAP / 2 + TRACK_WIDTH) * sin(rad(prevDeg));
         
-        glVertex3fv(&p[0]);
-        glVertex3fv(&p[3]);
-        glVertex3fv(&p[6]);
-        glVertex3fv(&p[9]);
-        
         quad(&p[0],&p[3],&p[6],&p[9]);
     }
+}
+
+void drawTrack() {
+    glColor3f(1.0, 1.0, 1.0);
+    glBindTexture(GL_TEXTURE_2D, trackTex);
+    
+    
+    
+    GLfloat p[12] = {0, 0, 0,
+                    TRACK_WIDTH, 0, 0,
+                    TRACK_WIDTH, 0, TRACK_LONG,
+                    0, 0, TRACK_LONG};
+    
+    quad(&p[0],&p[3],&p[6],&p[9]);
+    glTranslatef(TRACK_GAP + TRACK_WIDTH, 0.0, 0.0);
+    quad(&p[0],&p[3],&p[6],&p[9]);
+    glTranslatef(-(TRACK_GAP + TRACK_WIDTH), 0.0, 0.0);
+    
+    glTranslatef(TRACK_GAP / 2 + TRACK_WIDTH, 0, TRACK_LONG);
+
+    drawCurve(30);
+    
+    glTranslatef(-(TRACK_GAP / 2 + TRACK_WIDTH), 0, -TRACK_LONG);
+    
+    glTranslatef(TRACK_GAP / 2 + TRACK_WIDTH, 0, 0);
+    glRotatef(180, 0, 1, 0);
+    
+    drawCurve(30);
+    
+    glTranslatef(-(TRACK_GAP / 2 + TRACK_WIDTH), 0, 0);
+    
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void draw() {
     glClearColor(1.0, 1.0, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    ejes();
+    //ejes();
+    
+    // PISTA
     
     glPushMatrix();
     glTranslatef(-TRACK_WIDTH / 2, 0.f, 0.f);
     glCallList(track);
     glPopMatrix();
     
-    //SUELO
+    // SUELO PLANO (sigue a la cámara)
     
-    glColor3f(0.0, 0.2, 0.0);
+    glColor3f(0.0, 0.4, 0.0);
+    glBegin(GL_QUADS);
+    glVertex3f(-FAR + camX,-0.2,-FAR + camZ);
+    glVertex3f(FAR + camX,-0.2,-FAR + camZ);
+    glVertex3f(FAR + camX,-0.2,FAR + camZ);
+    glVertex3f(-FAR + camX,-0.2,FAR + camZ);
+    glEnd();
+    
+    //SUELO TEXTURIZADO
+    
+    glColor3f(1.0, 1.0, 1.0);
+    
+    glBindTexture(GL_TEXTURE_2D, grassTex);
     
     glBegin(GL_QUADS);
-    glVertex3f(-100 + camX,-0.1,-100 + camZ);
-    glVertex3f(100 + camX,-0.1,-100 + camZ);
-    glVertex3f(100 + camX,-0.1,100 + camZ);
-    glVertex3f(-100 + camX,-0.1,100 + camZ);
+    glTexCoord2f(0, 0);
+    glVertex3f(-FAR,-0.1,-FAR);
+    glTexCoord2f(10, 0);
+    glVertex3f(FAR,-0.1,-FAR);
+    glTexCoord2f(10, 10);
+    glVertex3f(FAR,-0.1,FAR);
+    glTexCoord2f(0, 10);
+    glVertex3f(-FAR,-0.1,FAR);
     glEnd();
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
     
     
     //FONDO
     
-    glPushMatrix();    
-    glTranslatef(0 + camX, 0, BACKGROUND_SIZE - 1 + camZ);
-    drawBackground();
-    glPopMatrix();
-    
-    glPushMatrix();    
-    glTranslatef(0 + camX, 0, -BACKGROUND_SIZE + camZ);
-    drawBackground();
-    glPopMatrix();
-    
     glPushMatrix();
-    glTranslatef(-BACKGROUND_SIZE + camX, 0, camZ);
-    glRotatef(90, 0.0, 1.0, 0.0);
-    drawBackground();
-    glPopMatrix();
-    
-    glPushMatrix();
-    glTranslatef(BACKGROUND_SIZE + camX, 0, camZ);
-    glRotatef(90, 0.0, 1.0, 0.0);
+    glTranslatef(camX, -1, camZ);
     drawBackground();
     glPopMatrix();
     
     // CARTELES PUBLICITARIOS
-    
-    /*glTranslatef(TRACK_GAP,0,12);
-    glRotatef(180, 0.0, 1.0, 0.0);
-    drawAd();
-    glTranslatef(-TRACK_GAP, 0.0, 0.0);*/
     
     glPushMatrix();
     glTranslatef(0,0,12);
@@ -238,6 +276,7 @@ void draw() {
     drawAd();
     glPopMatrix();
     
+    
     glutSwapBuffers();
     
     return;
@@ -245,21 +284,41 @@ void draw() {
 }
 
 void drawBackground() {
-    glBindTexture(GL_TEXTURE_2D, backgroundTex);   
-    glColor3f(1, 1, 1);
+    static const unsigned int C = 20;
     
+    glBindTexture(GL_TEXTURE_2D, backgroundTex);   
+    
+    glColor3f(1.0, 1.0, 1.0);
     glBegin(GL_QUADS);
-    glTexCoord2f(0, 0);
-    glVertex3f(-BACKGROUND_SIZE, -100, 0);
-    glTexCoord2f(0, 1);
-    glVertex3f(-BACKGROUND_SIZE, 100, 0);
-    glTexCoord2f(1, 1);
-    glVertex3f(BACKGROUND_SIZE, 100, 0);
-    glTexCoord2f(1, 0);
-    glVertex3f(BACKGROUND_SIZE, -100, 0);
+    
+    for (int i = 1; i <= C; i++) {
+      float angle = rad(i * (360.0 / C));
+      float prevAngle = rad((i - 1) * (360.0 / C));
+      
+      float x0 = cos(prevAngle) * FAR;
+      float z0 = sin(prevAngle) * FAR;
+      
+      float x1 = cos(angle) * FAR;
+      float z1 = sin(angle) * FAR;
+      
+      glTexCoord2f(prevAngle / (2 * PI), 0);
+      glVertex3f(x0, 0, z0);
+      glTexCoord2f(prevAngle / (2 * PI), 1);
+      glVertex3f(x0, 300, z0);
+      
+      glTexCoord2f(angle / (2 * PI), 1);
+      glVertex3f(x1, 300, z1);
+      glTexCoord2f(angle / (2 * PI), 0);
+      glVertex3f(x1, 0, z1);
+
+      
+    }
+    
     glEnd();
     
     glBindTexture(GL_TEXTURE_2D, 0);
+    
+    
 }
 
 void drawAd() {
@@ -282,6 +341,7 @@ void drawAd() {
     glTranslatef(TRACK_WIDTH / 2, -4, 0);
     
     glBegin(GL_QUADS);
+    
     //Barra vertical
     glColor3f(0.3, 0.3, 0.3);
     glVertex3f(-TRACK_WIDTH / 2, .0, .0);
@@ -301,7 +361,23 @@ void loop() {
     static int start = glutGet(GLUT_ELAPSED_TIME);
     int now = glutGet(GLUT_ELAPSED_TIME);
     double deltaTime = (now - start) / 1000.0;
-
+    
+    if (isKeyPressed(Key::Up)) {
+        module += 2 * deltaTime;
+    }
+    
+    if (isKeyPressed(Key::Down)) {
+        module -= 2 * deltaTime;
+        if (module < 0) { module = 0; }
+    }
+    
+    if (isKeyPressed(Key::Left)) {
+        angle += 20 * deltaTime;
+    }
+    
+    if (isKeyPressed(Key::Right)) {
+        angle -= 20 * deltaTime;
+    }
     
     ///ACTUALIZACIÓN DE LA POSICIÓN DEL VEHÍCULO
     
@@ -320,31 +396,13 @@ void loop() {
     gluLookAt(camX, camY, camZ, lookAtX, lookAtY, lookAtZ, 0.0, 1.0, 0.0);
     
     ///ACTUALIZACIÓN DEL TÍTULO DE LA VENTANA
-    std::string wt = windowTitle + " " + std::to_string(module) + " m/s";
+    std::string wt = windowTitle + " " + std::to_string(module) + " m/s, " + std::to_string(module * 3.6) + "km/h";
     glutSetWindowTitle(wt.c_str());
 
     
     start = now;
 
     glutPostRedisplay();
-}
-
-void onKeyPressed(unsigned char k, int x, int y) {}
-
-void onSpecialKeyPressed(int k, int x, int y) {
-    if (k == GLUT_KEY_UP) {
-        module += 0.1;
-    } else if (k == GLUT_KEY_DOWN) {
-        module -= 0.1;
-        if (module < 0) module = 0;
-    }
-    else if (k == GLUT_KEY_LEFT) {
-        angle += 1.25;
-    }
-    else if (k == GLUT_KEY_RIGHT) {
-        angle -= 1.25;
-    }
-    
 }
 
 
@@ -375,8 +433,6 @@ int main(int argc, char** argv) {
     glutDisplayFunc(draw);
     glutReshapeFunc(reshape);
     glutIdleFunc(loop);
-    glutKeyboardFunc(onKeyPressed);
-    glutSpecialFunc(onSpecialKeyPressed);
     
     glEnableClientState(GL_VERTEX_ARRAY | GL_COLOR_ARRAY);
     glEnable(GL_DEPTH_TEST);
@@ -394,6 +450,7 @@ int main(int argc, char** argv) {
     //gluLookAt(0.0, 1.0, 0.0, 0.0, 1.0, -1.0, 0.0, 1.0, 0.0);
     
     init();
+    initKeyboard();
     cout << windowTitle << " en marcha" << endl;
     
     glMatrixMode(GL_MODELVIEW);
