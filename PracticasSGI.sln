@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HolaOpenGL", "HolaOpenGL\HolaOpenGL.vcxproj", "{531753DF-4CFB-48C7-A8FF-565A6FF6339E}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pract5", "Pract5\Pract5.vcxproj", "{33CF4134-82EA-427C-9297-65F7559D43FF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pract6", "Pract6\Pract6.vcxproj", "{CE9BDBCA-EE86-43D3-BF42-A92650F98611}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pract7", "Pract7\Pract7.vcxproj", "{60E85071-1CEB-4408-AA90-4E86A5715F61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,14 @@ Global
 		{CE9BDBCA-EE86-43D3-BF42-A92650F98611}.Release|x64.Build.0 = Release|x64
 		{CE9BDBCA-EE86-43D3-BF42-A92650F98611}.Release|x86.ActiveCfg = Release|Win32
 		{CE9BDBCA-EE86-43D3-BF42-A92650F98611}.Release|x86.Build.0 = Release|Win32
+		{60E85071-1CEB-4408-AA90-4E86A5715F61}.Debug|x64.ActiveCfg = Debug|x64
+		{60E85071-1CEB-4408-AA90-4E86A5715F61}.Debug|x64.Build.0 = Debug|x64
+		{60E85071-1CEB-4408-AA90-4E86A5715F61}.Debug|x86.ActiveCfg = Debug|Win32
+		{60E85071-1CEB-4408-AA90-4E86A5715F61}.Debug|x86.Build.0 = Debug|Win32
+		{60E85071-1CEB-4408-AA90-4E86A5715F61}.Release|x64.ActiveCfg = Release|x64
+		{60E85071-1CEB-4408-AA90-4E86A5715F61}.Release|x64.Build.0 = Release|x64
+		{60E85071-1CEB-4408-AA90-4E86A5715F61}.Release|x86.ActiveCfg = Release|Win32
+		{60E85071-1CEB-4408-AA90-4E86A5715F61}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
