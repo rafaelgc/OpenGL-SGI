@@ -6,6 +6,9 @@
 #include <GL\freeglut.h>
 #endif
 
+#include <cctype>
+#include <iostream>
+
 bool Keyboard::keyState[KEYBOARD_BUFFER_SIZE];
 
 void Keyboard::init() {
@@ -24,22 +27,43 @@ bool Keyboard::isKeyPressed(Key key) {
 }
 
 void Keyboard::onKeyPressed(unsigned char k, int x, int y) {
-    // SIN IMPLEMENTAR.
-}
-
-void Keyboard::onSpecialKeyPressed(int k, int x, int y) {
-    setSpecialKeysState(k, true);
-}
-
-void Keyboard::onSpecialKeyReleased(int k, int x, int y) {
-    setSpecialKeysState(k, false);
+    setKeyState(k, true);
 }
 
 void Keyboard::onKeyReleased(unsigned char k, int x, int y) {
-    // SIN IMPLEMENTAR.
+    setKeyState(k, false);
 }
 
-void Keyboard::setSpecialKeysState(int key, bool state) {
+void Keyboard::setKeyState(unsigned char k, bool pressed) {
+    k = std::tolower(k);
+    
+    if (k == ' ') {
+        keyState[Key::Space] = pressed;
+    }
+    
+    for (int i = 'a'; i <= 'z'; i++) {
+        if (k == i) {
+            keyState[Key::A + i - 'a'] = pressed;
+            break;
+        }
+    }
+}
+
+void Keyboard::onSpecialKeyPressed(int k, int x, int y) {
+    setSpecialKeyState(k, true);
+}
+
+void Keyboard::onSpecialKeyReleased(int k, int x, int y) {
+    setSpecialKeyState(k, false);
+}
+
+
+void Keyboard::setSpecialKeyState(int key, bool state) {
+    /*if ((glutGetModifiers() & GLUT_ACTIVE_CTRL)) { 
+    std::cout << "CTRL " << state << std::endl; keyState[Key::Ctrl] = state; }
+    if ((glutGetModifiers() & GLUT_ACTIVE_ALT)) { std::cout << "ALT " << state << std::endl; keyState[Key::Alt] = state; }
+    if ((glutGetModifiers() & GLUT_ACTIVE_SHIFT)) { std::cout << "SHIFT " << state << std::endl; keyState[Key::Shift] = state; }*/
+
     if (key == GLUT_KEY_UP) {
       keyState[Key::Up] = state;
     } else if (key == GLUT_KEY_DOWN) {

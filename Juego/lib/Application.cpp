@@ -18,8 +18,8 @@ void Application::init(int *argc, char **argv, std::string windowTitle, unsigned
     //GLUT settings
     glutInit(argc, argv);
     
-    width = width;
-    height = height;
+    Application::width = width;
+    Application::height = height;
     
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(width, height);
@@ -34,6 +34,8 @@ void Application::init(int *argc, char **argv, std::string windowTitle, unsigned
     glEnable(GL_POINT_SMOOTH);
     glEnable(GL_TEXTURE_2D); 
     
+    Keyboard::init();
+    
 }
 
 void Application::run() {
@@ -45,19 +47,21 @@ void Application::draw() {
     SceneManager::instance().render();
 }
 
-void Application::reshape(int newWidth, int newHeight) {
-    float razonAD= float(newWidth) / newHeight;
+void Application::reshape(int w, int h) {
+    float RATIO = width / (float)height;
+    float razonAD= float(w)/h;
     float wp,hp;
-    if(razonAD < (width / height)){
-        wp = float(width);
-        hp = wp / (width / height);
-        glViewport(0, int(newHeight/2.0 - hp/2.0), newWidth, int(hp));
+    if(razonAD<RATIO){
+        wp= float(w);
+        hp= wp/RATIO;
+        glViewport(0,int(h/2.0-hp/2.0),w,int(hp));
     }
     else{
-        hp = float(newHeight);
-        wp = hp * (width / height);
-        glViewport(int(newWidth / 2.0- wp / 2.0), 0, int(wp), newHeight);
+        hp= float(h);
+        wp= hp*RATIO;
+        glViewport(int(w/2.0-wp/2.0),0,int(wp),h);
     }
+
 }
 
 void Application::loop() {

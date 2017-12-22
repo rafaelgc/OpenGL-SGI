@@ -1,15 +1,22 @@
 #include "GameScene.hpp"
-#include "lib/Keyboard.hpp"
 
+#include "lib/Keyboard.hpp"
+#include "lib/Application.hpp"
 #include "Utilidades.h"
-const float GameScene::TRACK_GAP = 50.f;
-const float GameScene::TRACK_WIDTH = 8.f;
-const float GameScene::TRACK_LONG = 50.f;
+
+const float GameScene::TRACK_GAP = 60.f;
+const float GameScene::TRACK_WIDTH = 10.f;
+const float GameScene::TRACK_LONG = 100.f;
 const float GameScene::CAM_FAR = 300.0;
 
 
 
 GameScene::GameScene() : Scene("GameScene") {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    gluPerspective(45, (float) Application::width / Application::height, 1, CAM_FAR);
+
     angle = 90.f;
     module = 0.f;
 
@@ -70,44 +77,93 @@ GameScene::GameScene() : Scene("GameScene") {
     
     glEndList();
     
-    ///// CAMARA
     
-    //CONFIGURAR CAMARA
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
 
-    gluPerspective(45, 1.6, 1, CAM_FAR);
-
-    //glMatrixMode(GL_MODELVIEW);
-    //glLoadIdentity();
-    //gluLookAt(0.0, 1.0, 0.0, 0.0, 1.0, -1.0, 0.0, 1.0, 0.0);
-    
-    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    
+    //SOMBRA
+    glShadeModel (GL_SMOOTH);
+    
+    //Luz de la luna
+    GLfloat moonPosition[] = { 0, 10.0, 10.0, 0.0 };
+    GLfloat moonAmbient[] = { 1.05, 1.05, 1.05 };
+    GLfloat moonDiffuse[] = { 1.05, 1.05, 1.05 };
+    GLfloat moonSpecular[] = {.0, .0, .0 };
+    glLightfv(GL_LIGHT0, GL_POSITION, moonPosition);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, moonDiffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, moonSpecular);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, moonAmbient);
+    glEnable(GL_LIGHT0);
+    
+    
+
+    //Faro
+    headlightPosition[0] = 0;
+    headlightPosition[1] = 0.7;
+    headlightPosition[2] = 0;
+    headlightPosition[3] = 1;
+    
+    GLfloat headlightAmbient[] = { 0.5, 0.5, 0.5 };
+    GLfloat headlightDiffuse[] = { 1.0, 1.0, 1.0 };
+    GLfloat headlightSpecular[] = {.3, .3, .3 };
+    GLfloat headlightDir[] = {0, -0.5, -1 };
+    glLightfv(GL_LIGHT1, GL_POSITION, headlightPosition);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, headlightDiffuse);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, headlightSpecular);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, headlightAmbient);
+    glLightfv(GL_LIGHT1,GL_SPOT_DIRECTION,headlightDir);
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 25.0);
+    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 20.0);
+    glEnable(GL_LIGHT1);
+}
+
+void GameScene::onActivate() {
+    Scene::onActivate();
+     //ILUMINACION
+    glEnable(GL_LIGHTING);
+    
+}
+
+void GameScene::onDeactivate() {
+    Scene::onDeactivate();
+    glDisable(GL_LIGHTING);
 }
 
 void GameScene::manageEvents(float deltaTime) {
     if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
         module += 2 * deltaTime;
     }
+    else {
+        module -= 2 * deltaTime;
+        if (module < 0.f) { module = 0.f; }
+    }
     
+    //Freno suave.
     if (Keyboard::isKeyPressed(Keyboard::Key::Down)) {
         module -= 2 * deltaTime;
         if (module < 0) { module = 0; }
     }
     
+    //Freno rápido.
+    if (Keyboard::isKeyPressed(Keyboard::Key::Space)) {
+        module -= max(4, module / 3) * deltaTime;
+        if (module < 0) { module = 0; }
+    }
+    
     if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
-        angle += 20 * deltaTime;
+        angle += min(30, 30 * (module / 10)) * deltaTime;
     }
     
     if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-        angle -= 20 * deltaTime;
+        angle -= min(30, 30 * (module / 10)) * deltaTime;
     }
 }
 
 void GameScene::logic(float deltaTime) {
     ///ACTUALIZACIÓN DE LA POSICIÓN DEL VEHÍCULO
+    
+    //std::cout << 1 / deltaTime << std::endl;
     
     camZ += sin(rad(angle)) * module * deltaTime;
     camX -= cos(rad(angle)) * module * deltaTime;
@@ -124,11 +180,15 @@ void GameScene::logic(float deltaTime) {
     gluLookAt(camX, camY, camZ, lookAtX, lookAtY, lookAtZ, 0.0, 1.0, 0.0);
     
     ///ACTUALIZACIÓN DEL TÍTULO DE LA VENTANA
-    ///std::string wt = windowTitle + " " + std::to_string(module) + " m/s, " + std::to_string(module * 3.6) + "km/h";
-    //glutSetWindowTitle(wt.c_str());
+    std::string wt =  "Juego " + std::to_string(module) + " m/s, " + std::to_string(module * 3.6) + "km/h";
+    glutSetWindowTitle(wt.c_str());
 }
 
 void GameScene::render() {
+
+    
+    texto(0.5, 0.5, "Hola mundo");
+
     // PISTA
     
     glPushMatrix();
@@ -186,24 +246,23 @@ void GameScene::render() {
     glTranslatef(0,0,12);
     drawAd();
     glPopMatrix();
-    
-    std::cout << "Dibujando" << std::endl;
 }
 
 void GameScene::drawTrack() {
     glColor3f(1.0, 1.0, 1.0);
     glBindTexture(GL_TEXTURE_2D, trackTex);
     
-    
-    
-    GLfloat p[12] = {0, 0, 0,
-                    TRACK_WIDTH, 0, 0,
+    GLfloat p[12] = {
+                    0, 0, TRACK_LONG,
                     TRACK_WIDTH, 0, TRACK_LONG,
-                    0, 0, TRACK_LONG};
+                    TRACK_WIDTH, 0, 0,
+                    0, 0, 0,
+                    
+                    };
     
-    quad(&p[0],&p[3],&p[6],&p[9]);
+    quad(&p[0],&p[3],&p[6],&p[9], 15, 100);
     glTranslatef(TRACK_GAP + TRACK_WIDTH, 0.0, 0.0);
-    quad(&p[0],&p[3],&p[6],&p[9]);
+    quad(&p[0],&p[3],&p[6],&p[9], 50, 50);
     glTranslatef(-(TRACK_GAP + TRACK_WIDTH), 0.0, 0.0);
     
     glTranslatef(TRACK_GAP / 2 + TRACK_WIDTH, 0, TRACK_LONG);
@@ -296,11 +355,11 @@ void GameScene::drawBackground() {
       float angle = rad(i * (360.0 / C));
       float prevAngle = rad((i - 1) * (360.0 / C));
       
-      float x0 = cos(prevAngle) * CAM_FAR;
-      float z0 = sin(prevAngle) * CAM_FAR;
+      float x0 = cos(prevAngle) * (CAM_FAR - 10);
+      float z0 = sin(prevAngle) * (CAM_FAR - 10);
       
-      float x1 = cos(angle) * CAM_FAR;
-      float z1 = sin(angle) * CAM_FAR;
+      float x1 = cos(angle) * (CAM_FAR - 10);
+      float z1 = sin(angle) * (CAM_FAR - 10);
       
       glTexCoord2f(prevAngle / (2 * PI), 0);
       glVertex3f(x0, 0, z0);

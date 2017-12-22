@@ -12,7 +12,7 @@ class Keyboard {
     public:
     
     // No están implementadas todas las teclas.
-    enum Key {Up, Down, Left, Right};
+    enum Key {Up, Down, Left, Right, Space, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z};
     
     /*Inicializa los callbacks y el buffer.*/
     static void init();
@@ -25,7 +25,8 @@ class Keyboard {
     static const unsigned int KEYBOARD_BUFFER_SIZE = 256;
     static bool keyState[KEYBOARD_BUFFER_SIZE];
     
-    static void setSpecialKeysState(int key, bool pressed);
+    static void setSpecialKeyState(int key, bool pressed);
+    static void setKeyState(unsigned char k, bool pressed);
 
     //Callbacks que deben ser ejecutados por GLUT.
     static void onKeyPressed(unsigned char k, int x, int y);

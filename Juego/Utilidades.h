@@ -67,7 +67,7 @@ void quadtex( GLfloat v0[3], GLfloat v1[3], GLfloat v2[3], GLfloat v3[3],
 void ejes();
 /* Dibuja unos ejes de longitud 1 y una esferita en el origen */
 
-void texto(unsigned int x, unsigned int y, char *text, const GLfloat *color = ROJO, void *font = GLUT_BITMAP_HELVETICA_18, bool WCS = true);
+void texto(unsigned int x, unsigned int y, std::string texto, const GLfloat *color = ROJO, void *font = GLUT_BITMAP_HELVETICA_18, bool WCS = false);
 /* Muestra en la posicion (x, y) del viewport la cadena de texto con la fuente y el color indicados
    Los tres ultimos parametros son opcionales.
    @WCS: x,y en coordenadas del mundo -true- o del viewport -false-.

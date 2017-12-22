@@ -443,7 +443,7 @@ int main(int argc, char** argv) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(45, 1.6, 1, CAM_FAR);
+    gluPerspective(45, RATIO, 1, CAM_FAR);
 
     //glMatrixMode(GL_MODELVIEW);
     //glLoadIdentity();

@@ -25,13 +25,13 @@ const float RATIO = (float)WIDTH / HEIGHT;
 int main(int argc, char** argv) {
 
     FreeImage_Initialise();
+    Application::init(&argc, argv, "Juego", WIDTH, HEIGHT);
     
     GameScene gameScene;
     
     SceneManager::instance().addScene(gameScene);
     SceneManager::instance().activateScene("GameScene");
     
-    Application::init(&argc, argv, "Juego", WIDTH, HEIGHT);
     Application::run();
     
 	FreeImage_DeInitialise();

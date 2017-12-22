@@ -197,7 +197,7 @@ void ejes()
 	glDeleteLists(id,1);
 }
 
-void texto(unsigned int x, unsigned int y, char *text, const GLfloat *color, void *font, bool WCS)
+void texto(unsigned int x, unsigned int y, std::string texto, const GLfloat *color, void *font, bool WCS)
 {	
 	glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT);
 	glDisable(GL_LIGHTING);
@@ -221,10 +221,10 @@ void texto(unsigned int x, unsigned int y, char *text, const GLfloat *color, voi
 
 		glRasterPos2i(x,y);
 
-		while (*text) 
-		{
-			glutBitmapCharacter(font, *text++);
-		}
+        for (char c : texto) {
+            glutBitmapCharacter(font, c);
+        }
+        
 		glPopMatrix();
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
@@ -232,10 +232,9 @@ void texto(unsigned int x, unsigned int y, char *text, const GLfloat *color, voi
 	}
 	else{
 		glRasterPos2i(x,y);
-		while (*text) 
-		{
-			glutBitmapCharacter(font, *text++);
-		}
+		for (char c : texto) {
+            glutBitmapCharacter(font, c);
+        }
 	}
 
 	glPopAttrib();

@@ -22,6 +22,9 @@ class GameScene : public Scene {
     void logic(float deltaTime);
     void render();
     
+    void onActivate();
+    void onDeactivate();
+    
     private:
     
     void drawTrack();
@@ -36,6 +39,8 @@ class GameScene : public Scene {
     GLuint adTex, trackTex, grassTex, backgroundTex;
     
     GLuint track;
+    
+    GLfloat headlightPosition[4];
 };
 
 #endif
