@@ -6,8 +6,8 @@
 
 #include <algorithm>
 
-const float GameScene::TRACK_GAP = 60.f;
-const float GameScene::TRACK_WIDTH = 10.f;
+const float GameScene::TRACK_GAP = 65.f;
+const float GameScene::TRACK_WIDTH = 12.f;
 const float GameScene::TRACK_LONG = 100.f;
 const float GameScene::CAM_FAR = 300.0;
 
@@ -31,6 +31,7 @@ GameScene::GameScene() : Scene("GameScene") {
     lookAtZ = -1.f;
     
     score = 0;
+    visibleScore = 0.f;
     
     /*CARGA IMAGENES*/
     glGenTextures(1,&backgroundTex);
@@ -90,16 +91,12 @@ GameScene::GameScene() : Scene("GameScene") {
     glShadeModel (GL_SMOOTH);
     
     //Luz de la luna
-    GLfloat moonPosition[] = { 0, 10.0, 10.0, 0.0 };
-    GLfloat moonAmbient[] = { 0.10, 0.10, 0.10 };
-    GLfloat moonDiffuse[] = { .10, .10, .10 };
-    GLfloat moonSpecular[] = {1.0, 1.0, 1.0 };
-    glLightfv(GL_LIGHT0, GL_POSITION, moonPosition);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, moonDiffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, moonSpecular);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, moonAmbient);
-    glEnable(GL_LIGHT0);
-    
+    globalLight.setType(Light::Type::Directional);
+    globalLight.setPosition(0, 10, 10);
+    globalLight.setAmbient(0.1, 0.1, 0.1);
+    globalLight.setDiffuse(0.1, 0.1, 0.1);
+    globalLight.setSpecular(1.0, 1.0, 1.0);
+    globalLight.enable(GL_LIGHT0);
     
 
     //Faro
@@ -108,18 +105,14 @@ GameScene::GameScene() : Scene("GameScene") {
     headlightPosition[2] = 0;
     headlightPosition[3] = 1;
     
-    GLfloat headlightAmbient[] = { 0.8, 0.8, 0.8 };
-    GLfloat headlightDiffuse[] = { 1.0, 1.0, 1.0 };
-    GLfloat headlightSpecular[] = {.3, .3, .3 };
-    GLfloat headlightDir[] = {0, -0.2, -1 };
-    glLightfv(GL_LIGHT1, GL_POSITION, headlightPosition);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, headlightDiffuse);
-    glLightfv(GL_LIGHT1, GL_SPECULAR, headlightSpecular);
-    glLightfv(GL_LIGHT1, GL_AMBIENT, headlightAmbient);
-    glLightfv(GL_LIGHT1,GL_SPOT_DIRECTION,headlightDir);
-    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 25.0);
-    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 20.0);
-    glEnable(GL_LIGHT1);
+    headlight.setType(Light::Type::Positional);
+    headlight.setAmbient(0.8, 0.8, 0.8);
+    headlight.setDiffuse(1.0, 1.0, 1.0);
+    headlight.setSpecular(0.3, 0.3, 0.3);
+    headlight.setDirection(0, -0.2, -1);
+    headlight.setCutoff(25.0);
+    headlight.setExponent(20.0);
+    headlight.enable(GL_LIGHT1);
     
     // PUNTOS
     
@@ -143,7 +136,7 @@ void GameScene::onDeactivate() {
 
 void GameScene::manageEvents(float deltaTime) {
     if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
-        speed += 2 * deltaTime;
+        speed += 4 * deltaTime;
     }
     else {
         speed -= 2 * deltaTime;
@@ -162,20 +155,18 @@ void GameScene::manageEvents(float deltaTime) {
         if (speed < 0) { speed = 0; }
     }
     
+    // GIRO
     if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
-        angle += std::min<float>(30, 30 * (speed / 10)) * deltaTime;
+        angle += std::min<float>(40, 40 * (speed / 10)) * deltaTime;
     }
     
     if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-        angle -= std::min<float>(30, 30 * (speed / 10)) * deltaTime;
+        angle -= std::min<float>(40, 40 * (speed / 10)) * deltaTime;
     }
 }
 
 void GameScene::logic(float deltaTime) {
     ///ACTUALIZACIÓN DE LA POSICIÓN DEL VEHÍCULO
-    
-    //std::cout << 1 / deltaTime << std::endl;
-    
     camZ += sin(rad(angle)) * speed * deltaTime;
     camX -= cos(rad(angle)) * speed * deltaTime;
     
@@ -189,6 +180,12 @@ void GameScene::logic(float deltaTime) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(camX, camY, camZ, lookAtX, lookAtY, lookAtZ, 0.0, 1.0, 0.0);
+    
+    /// PUNTUACION
+    
+    if (visibleScore < score) {
+        visibleScore += 1000 * deltaTime;
+    }
     
     /// POWER UPS
     
@@ -287,7 +284,7 @@ void GameScene::render() {
     std::string sSpeed = std::to_string(speed * 3.6);
     texto(50, 50, sSpeed.substr(0, sSpeed.find_first_of("."))  + " km/h", BLANCO);
     
-    texto(Application::width - 100, 50, std::to_string(score), BLANCO);
+    texto(Application::width - 100, 50, std::to_string((int) visibleScore), BLANCO);
     
     for (Point &point : points) {
         point.draw();

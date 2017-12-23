@@ -3,6 +3,7 @@
 
 #include "lib/Scene.hpp"
 #include "lib/GL.hpp"
+#include "lib/Light.hpp"
 
 #include "Point.hpp"
 
@@ -43,6 +44,10 @@ class GameScene : public Scene {
     
     std::vector<Point> points;
     int score;
+    float visibleScore;
+    
+    Light headlight, globalLight;
+    
 };
 
 #endif
