@@ -20,10 +20,6 @@
 using namespace std;
 
 #define PI 3.1415926
-#ifndef max
-#define max(a,b) (a>b?a:b)
-#define min(a,b) (a<b?a:b)
-#endif
 #define signo(a) (a<0?-1:1)
 #define deg(a) (a*180/PI)
 #define rad(a) (a*PI/180)

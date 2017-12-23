@@ -2,12 +2,11 @@
 #define GAMESCENE_HPP
 
 #include "lib/Scene.hpp"
+#include "lib/GL.hpp"
 
-#ifdef __GNUC__
-#include <GL/freeglut.h>
-#else
-#include <GL\freeglut.h>
-#endif
+#include "Point.hpp"
+
+#include <vector>
 
 class GameScene : public Scene {
     public:
@@ -32,7 +31,7 @@ class GameScene : public Scene {
     void drawAd();
     void drawBackground();
     
-    float angle, module;
+    float angle, speed;
     float camX, camY, camZ;
     float lookAtX, lookAtY, lookAtZ;
     
@@ -41,6 +40,9 @@ class GameScene : public Scene {
     GLuint track;
     
     GLfloat headlightPosition[4];
+    
+    std::vector<Point> points;
+    int score;
 };
 
 #endif

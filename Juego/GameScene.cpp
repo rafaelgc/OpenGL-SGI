@@ -4,6 +4,8 @@
 #include "lib/Application.hpp"
 #include "Utilidades.h"
 
+#include <algorithm>
+
 const float GameScene::TRACK_GAP = 60.f;
 const float GameScene::TRACK_WIDTH = 10.f;
 const float GameScene::TRACK_LONG = 100.f;
@@ -18,7 +20,7 @@ GameScene::GameScene() : Scene("GameScene") {
     gluPerspective(45, (float) Application::width / Application::height, 1, CAM_FAR);
 
     angle = 90.f;
-    module = 0.f;
+    speed = 0.f;
 
     camX = 0.f;
     camY = 1.f;
@@ -27,6 +29,8 @@ GameScene::GameScene() : Scene("GameScene") {
     lookAtX = 0.f;
     lookAtY = 1.f;
     lookAtZ = -1.f;
+    
+    score = 0;
     
     /*CARGA IMAGENES*/
     glGenTextures(1,&backgroundTex);
@@ -87,9 +91,9 @@ GameScene::GameScene() : Scene("GameScene") {
     
     //Luz de la luna
     GLfloat moonPosition[] = { 0, 10.0, 10.0, 0.0 };
-    GLfloat moonAmbient[] = { 1.05, 1.05, 1.05 };
-    GLfloat moonDiffuse[] = { 1.05, 1.05, 1.05 };
-    GLfloat moonSpecular[] = {.0, .0, .0 };
+    GLfloat moonAmbient[] = { 0.10, 0.10, 0.10 };
+    GLfloat moonDiffuse[] = { .10, .10, .10 };
+    GLfloat moonSpecular[] = {1.0, 1.0, 1.0 };
     glLightfv(GL_LIGHT0, GL_POSITION, moonPosition);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, moonDiffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, moonSpecular);
@@ -104,10 +108,10 @@ GameScene::GameScene() : Scene("GameScene") {
     headlightPosition[2] = 0;
     headlightPosition[3] = 1;
     
-    GLfloat headlightAmbient[] = { 0.5, 0.5, 0.5 };
+    GLfloat headlightAmbient[] = { 0.8, 0.8, 0.8 };
     GLfloat headlightDiffuse[] = { 1.0, 1.0, 1.0 };
     GLfloat headlightSpecular[] = {.3, .3, .3 };
-    GLfloat headlightDir[] = {0, -0.5, -1 };
+    GLfloat headlightDir[] = {0, -0.2, -1 };
     glLightfv(GL_LIGHT1, GL_POSITION, headlightPosition);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, headlightDiffuse);
     glLightfv(GL_LIGHT1, GL_SPECULAR, headlightSpecular);
@@ -116,6 +120,13 @@ GameScene::GameScene() : Scene("GameScene") {
     glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 25.0);
     glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 20.0);
     glEnable(GL_LIGHT1);
+    
+    // PUNTOS
+    
+    for (int i = 15; i <= 60; i += 10) {
+        points.push_back(Point(0, 1, i));
+    }
+    
 }
 
 void GameScene::onActivate() {
@@ -132,31 +143,31 @@ void GameScene::onDeactivate() {
 
 void GameScene::manageEvents(float deltaTime) {
     if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
-        module += 2 * deltaTime;
+        speed += 2 * deltaTime;
     }
     else {
-        module -= 2 * deltaTime;
-        if (module < 0.f) { module = 0.f; }
+        speed -= 2 * deltaTime;
+        if (speed < 0.f) { speed = 0.f; }
     }
     
     //Freno suave.
     if (Keyboard::isKeyPressed(Keyboard::Key::Down)) {
-        module -= 2 * deltaTime;
-        if (module < 0) { module = 0; }
+        speed -= 2 * deltaTime;
+        if (speed < 0) { speed = 0; }
     }
     
     //Freno rápido.
     if (Keyboard::isKeyPressed(Keyboard::Key::Space)) {
-        module -= max(4, module / 3) * deltaTime;
-        if (module < 0) { module = 0; }
+        speed -= std::max<float>(4, speed / 3) * deltaTime;
+        if (speed < 0) { speed = 0; }
     }
     
     if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
-        angle += min(30, 30 * (module / 10)) * deltaTime;
+        angle += std::min<float>(30, 30 * (speed / 10)) * deltaTime;
     }
     
     if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-        angle -= min(30, 30 * (module / 10)) * deltaTime;
+        angle -= std::min<float>(30, 30 * (speed / 10)) * deltaTime;
     }
 }
 
@@ -165,30 +176,45 @@ void GameScene::logic(float deltaTime) {
     
     //std::cout << 1 / deltaTime << std::endl;
     
-    camZ += sin(rad(angle)) * module * deltaTime;
-    camX -= cos(rad(angle)) * module * deltaTime;
+    camZ += sin(rad(angle)) * speed * deltaTime;
+    camX -= cos(rad(angle)) * speed * deltaTime;
     
     ///ACTUALIZACIÓN DEL PUNTO DONDE MIRA LA CÁMARA
     /*El usuario siempre mira hacia delante por eso se calcula
      el valor absoluto del módulo. Se le suma 1 para garantizar
      que sea mayor que 0.*/
-    lookAtZ = camZ + sin(rad(angle)) * (abs(module) + 1);
-    lookAtX = camX - cos(rad(angle)) * (abs(module) + 1);
+    lookAtZ = camZ + sin(rad(angle)) * (abs(speed) + 1);
+    lookAtX = camX - cos(rad(angle)) * (abs(speed) + 1);
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(camX, camY, camZ, lookAtX, lookAtY, lookAtZ, 0.0, 1.0, 0.0);
     
+    /// POWER UPS
+    
+    for (Point &point : points) {
+        if (point.manage(camX, camY, camZ, deltaTime)) {
+            score += point.getScored();
+            std::cout << score << std::endl;
+        }
+    }
+    
+    
+    
     ///ACTUALIZACIÓN DEL TÍTULO DE LA VENTANA
-    std::string wt =  "Juego " + std::to_string(module) + " m/s, " + std::to_string(module * 3.6) + "km/h";
+    std::string wt =  "Juego " + std::to_string(speed) + " m/s, " + std::to_string(speed * 3.6) + "km/h";
     glutSetWindowTitle(wt.c_str());
 }
 
 void GameScene::render() {
-
+    if (getState() == State::Inactive) {
+        //Si la escena está inactiva, salimos directamente.
+        return;
+    }
     
-    texto(0.5, 0.5, "Hola mundo");
-
+    //
+    ejes();
+    
     // PISTA
     
     glPushMatrix();
@@ -246,6 +272,26 @@ void GameScene::render() {
     glTranslatef(0,0,12);
     drawAd();
     glPopMatrix();
+    
+    ///
+    
+    glColor3f(0.5, 0.2, 0.2);
+    glBegin(GL_QUADS);
+    glNormal3f(0, 0, -1);
+    glVertex3f(0, 0, 5);
+    glVertex3f(0, 1, 5);
+    glVertex3f(1, 1, 5);
+    glVertex3f(1, 0, 5);
+    glEnd();
+    
+    std::string sSpeed = std::to_string(speed * 3.6);
+    texto(50, 50, sSpeed.substr(0, sSpeed.find_first_of("."))  + " km/h", BLANCO);
+    
+    texto(Application::width - 100, 50, std::to_string(score), BLANCO);
+    
+    for (Point &point : points) {
+        point.draw();
+    }
 }
 
 void GameScene::drawTrack() {
@@ -260,9 +306,9 @@ void GameScene::drawTrack() {
                     
                     };
     
-    quad(&p[0],&p[3],&p[6],&p[9], 15, 100);
+    quad(&p[0],&p[3],&p[6],&p[9], 50, 100);
     glTranslatef(TRACK_GAP + TRACK_WIDTH, 0.0, 0.0);
-    quad(&p[0],&p[3],&p[6],&p[9], 50, 50);
+    quad(&p[0],&p[3],&p[6],&p[9], 50, 100);
     glTranslatef(-(TRACK_GAP + TRACK_WIDTH), 0.0, 0.0);
     
     glTranslatef(TRACK_GAP / 2 + TRACK_WIDTH, 0, TRACK_LONG);
