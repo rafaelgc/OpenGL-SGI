@@ -28,6 +28,7 @@ class Light {
     void setCutoff(float cutoff);
     void setExponent(float exponent);
     
+    void update(GLenum light);
     void enable(GLenum light);
     
     protected:

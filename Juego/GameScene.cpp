@@ -17,7 +17,7 @@ GameScene::GameScene() : Scene("GameScene") {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(45, (float) Application::width / Application::height, 1, CAM_FAR);
+    gluPerspective(90, (float) Application::width / Application::height, 1, CAM_FAR);
 
     angle = 90.f;
     speed = 0.f;
@@ -93,26 +93,66 @@ GameScene::GameScene() : Scene("GameScene") {
     //Luz de la luna
     globalLight.setType(Light::Type::Directional);
     globalLight.setPosition(0, 10, 10);
-    globalLight.setAmbient(0.1, 0.1, 0.1);
-    globalLight.setDiffuse(0.1, 0.1, 0.1);
-    globalLight.setSpecular(1.0, 1.0, 1.0);
-    globalLight.enable(GL_LIGHT0);
+    globalLight.setAmbient(0.01, 0.01, 0.01);
+    globalLight.setDiffuse(0.01, 0.01, 0.01);
+    globalLight.setSpecular(0.01, 0.01, 0.01);
     
-
+    lightingManager.addLight(globalLight, false, true);
+    
     //Faro
-    headlightPosition[0] = 0;
-    headlightPosition[1] = 0.7;
-    headlightPosition[2] = 0;
-    headlightPosition[3] = 1;
     
     headlight.setType(Light::Type::Positional);
+    headlight.setPosition(.0, .7, .0);
     headlight.setAmbient(0.8, 0.8, 0.8);
     headlight.setDiffuse(1.0, 1.0, 1.0);
     headlight.setSpecular(0.3, 0.3, 0.3);
     headlight.setDirection(0, -0.2, -1);
     headlight.setCutoff(25.0);
     headlight.setExponent(20.0);
-    headlight.enable(GL_LIGHT1);
+    
+    lightingManager.addLight(headlight, false, true);
+    
+    //Farolas
+    /*
+    streetlights[0].setType(Light::Type::Positional);
+    streetlights[0].setAmbient(0.8, 0.8, 0.8);
+    streetlights[0].setDiffuse(1.0, 1.0, 1.0);
+    streetlights[0].setSpecular(0.3, 0.3, 0.3);
+    streetlights[0].setDirection(0, -1, 0);
+    streetlights[0].setCutoff(25.0);
+    streetlights[0].setExponent(20.0);
+    streetlights[0].setPosition(0, 4, 2);
+    */
+    
+    streetlights[0].setType(Light::Type::Positional);
+    streetlights[0].setPosition(0.0, 4, 0);
+    streetlights[0].setAmbient(0.8, 0.8, 0.8);
+    streetlights[0].setDiffuse(1.0, 1.0, 1.0);
+    streetlights[0].setSpecular(0.3, 0.3, 0.3);
+    streetlights[0].setDirection(0, -0.2, 0);
+    streetlights[0].setCutoff(25.0);
+    streetlights[0].setExponent(20.0);
+    
+    streetlights[1] = streetlights[2] = streetlights[3] = streetlights[4] = streetlights[5] = streetlights[6] = streetlights[7] = streetlights[0];
+    
+    lightingManager.addLight(streetlights[0]);
+    lightingManager.addLight(streetlights[1]);
+    lightingManager.addLight(streetlights[2]);
+    lightingManager.addLight(streetlights[3]);
+    lightingManager.addLight(streetlights[4]);
+    lightingManager.addLight(streetlights[5]);
+    lightingManager.addLight(streetlights[6]);
+    //lightingManager.addLight(streetlights[7]);
+    
+    //streetlights[0].enable(GL_LIGHT3);
+    
+    for (int i = 0; i < 8; i++) {
+        streetlights[i].setPosition(.0, 4.0, 8 + i * 8);
+        
+        //lightingManager.addLight(streetlights[i]);
+    }
+    
+    
     
     // PUNTOS
     
@@ -146,7 +186,7 @@ void GameScene::manageEvents(float deltaTime) {
     //Freno suave.
     if (Keyboard::isKeyPressed(Keyboard::Key::Down)) {
         speed -= 2 * deltaTime;
-        if (speed < 0) { speed = 0; }
+        //if (speed < 0) { speed = 0; }
     }
     
     //Freno rápido.
@@ -157,15 +197,42 @@ void GameScene::manageEvents(float deltaTime) {
     
     // GIRO
     if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
-        angle += std::min<float>(40, 40 * (speed / 10)) * deltaTime;
+        //angle += std::min<float>(40, 40 * (speed / 10)) * deltaTime;
+        angle += 30 * deltaTime;
     }
     
     if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-        angle -= std::min<float>(40, 40 * (speed / 10)) * deltaTime;
+        angle -= 30 * deltaTime;
+        //angle -= std::min<float>(40, 40 * (speed / 10)) * deltaTime;
     }
 }
 
 void GameScene::logic(float deltaTime) {
+
+
+    float vx = camX - lookAtX;
+    float vy = camY - lookAtY;
+    float vz = camZ - lookAtZ;
+    float lookModule = sqrt(vx * vx + vy * vy + vz * vz);
+    
+    float lx = camX - 0;
+    float ly = camY - 0;
+    float lz = camZ - 0;
+    
+    float lmodule = sqrt(lx * lx + ly * ly + lz * lz);
+        
+    float ang = acos((vx * lx + vy * ly + vz * lz) / (lmodule * lookModule));
+    
+    //std::cout << deg(ang) << " mod: " << lmodule << std::endl;
+
+    /*for (int i = 0; i < 8; i++) {
+        streetlights[i].setPosition(.0, 4.0, 8 + i * 2);
+    }*/
+    
+    //streetlights[0].update(GL_LIGHT0);
+
+    lightingManager.update(camX, camY, camZ, lookAtX, lookAtY, lookAtZ);
+
     ///ACTUALIZACIÓN DE LA POSICIÓN DEL VEHÍCULO
     camZ += sin(rad(angle)) * speed * deltaTime;
     camX -= cos(rad(angle)) * speed * deltaTime;
@@ -196,7 +263,7 @@ void GameScene::logic(float deltaTime) {
         }
     }
     
-    
+    //lightingManager.update(camX, camY, camZ);
     
     ///ACTUALIZACIÓN DEL TÍTULO DE LA VENTANA
     std::string wt =  "Juego " + std::to_string(speed) + " m/s, " + std::to_string(speed * 3.6) + "km/h";

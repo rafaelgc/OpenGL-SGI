@@ -79,7 +79,7 @@ void Light::setExponent(float exponent) {
     this->exponent = exponent;
 }
 
-void Light::enable(GLenum light) {
+void Light::update(GLenum light) {
     glLightfv(light, GL_POSITION, position);
     glLightfv(light, GL_DIFFUSE, diffuse);
     glLightfv(light, GL_SPECULAR, specular);
@@ -89,5 +89,9 @@ void Light::enable(GLenum light) {
     glLightfv(light,GL_SPOT_DIRECTION,direction);
     glLightf(light, GL_SPOT_CUTOFF, cutoff);
     glLightf(light, GL_SPOT_EXPONENT, exponent);
+}
+
+void Light::enable(GLenum light) {
+    update(light);
     glEnable(light);
 }

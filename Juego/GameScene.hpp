@@ -3,6 +3,7 @@
 
 #include "lib/Scene.hpp"
 #include "lib/GL.hpp"
+#include "lib/LightingManager.hpp"
 #include "lib/Light.hpp"
 
 #include "Point.hpp"
@@ -46,8 +47,9 @@ class GameScene : public Scene {
     int score;
     float visibleScore;
     
-    Light headlight, globalLight;
     
+    Light headlight, globalLight, streetlights[8];
+    LightingManager lightingManager;
 };
 
 #endif
