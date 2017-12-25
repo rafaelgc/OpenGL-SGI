@@ -29,6 +29,13 @@ class LightSettings {
     bool getUpdatePosition() { return updatePosition; }
 };
 
+class LightingManagerComparator {
+    public:
+    bool operator()(LightState & ls1, LightState & ls2) {
+        return true;
+    }
+};
+
 /**
  * OpenGL permite establecer 8 luces de manera simultánea. Esta
  * clase es un planificador que, dadas una serie de luces,

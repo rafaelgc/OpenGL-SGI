@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+#include <queue>
+
 LightingManager::LightingManager() {
     visionDistance = 100.0;
 }
@@ -14,6 +16,8 @@ void LightingManager::addLight(Light &light, bool updatePosition, bool force) {
 }
 
 void LightingManager::update(float x, float y, float z, float lookAtX, float lookAtY, float lookAtZ) {
+//    LightingManagerComparator c;
+//    std::priority_queue<LightState, std::vector<LightState>, c> queue;
     
     // Desde este método se ocultan/muestran las luces
     // posicionales para gestionar fácilmente más de 8
