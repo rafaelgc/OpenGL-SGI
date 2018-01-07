@@ -12,6 +12,8 @@
 
 class GameScene : public Scene {
     public:
+    enum RenderMode { Solid, Wired };
+    
     static const float TRACK_GAP;
     static const float TRACK_WIDTH;
     static const float TRACK_LONG;
@@ -26,12 +28,22 @@ class GameScene : public Scene {
     void onActivate();
     void onDeactivate();
     
+    void setDay();
+    void setNight();
+    
+    void fog(); // Enciende/apaga.
+    void updateFogColor();
+    
     private:
     
-    void drawTrack();
-    void drawCurve(unsigned int q);
+    void draw(bool hd = true);
+    void drawTrack(bool hd = true, bool wired = false);
+    void drawCurve(unsigned int q,  bool hd = true, bool wired = false);
     void drawAd();
     void drawBackground();
+    void drawTerrain(float quadSize, int quadsAmount, float y, float tex = 1);
+    
+    void switchRenderMode();
     
     float angle, speed;
     float camX, camY, camZ;
@@ -39,7 +51,7 @@ class GameScene : public Scene {
     
     GLuint adTex, trackTex, grassTex, backgroundTex;
     
-    GLuint track;
+    GLuint track, bTrack, trackWired, bTrackWired;
     
     GLfloat headlightPosition[4];
     
@@ -50,6 +62,11 @@ class GameScene : public Scene {
     
     Light headlight, globalLight, streetlights[8];
     LightingManager lightingManager;
+    bool day;
+    bool hud;
+    bool fogEnabled;
+    
+    RenderMode renderMode;
 };
 
 #endif

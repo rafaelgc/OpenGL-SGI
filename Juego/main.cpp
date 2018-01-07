@@ -4,6 +4,7 @@
 #else
 #include <GL\freeglut.h>
 #endif
+
 #include <ctime>
 #include <string>
 #include "Utilidades.h"
@@ -14,23 +15,39 @@
 #include "lib/Keyboard.hpp"
 
 #include "GameScene.hpp"
+#include "MenuScene.hpp"
+#include "InstructionsScene.hpp"
 
+#include <iostream>
 
 using namespace std;
 
-// ATRIBUTOS DE LA VISTA
-const unsigned int WIDTH = 1440, HEIGHT = 900;
-const float RATIO = (float)WIDTH / HEIGHT;
+// ATRIBUTOS DE LA VENTANA
+const unsigned int WIDTH = 800, HEIGHT = 600;
 
 int main(int argc, char** argv) {
 
     FreeImage_Initialise();
     Application::init(&argc, argv, "Juego", WIDTH, HEIGHT);
     
-    GameScene gameScene;
+    std::cout << "INSTRUCCIONES" << std::endl;
+    std::cout << "Flecha arriba/abajo: acelerar y frenar" << std::endl;
+    std::cout << "Flecha izq./der.: giro del vehículo (debe estar en movimiento)" << std::endl;
+    std::cout << "Espacio: freno rápido" << std::endl;
+    std::cout << "N: activar/desactivar niebla" << std::endl;
+    std::cout << "L: dia/noche" << std::endl;
+    std::cout << "S: activar/desactivar modo alámbrico" << std::endl;
+    std::cout << "C: activar/desactivar hud" << std::endl;
     
+    GameScene gameScene;
+    MenuScene menuScene;
+    InstructionsScene instructionsScene;
+    
+    SceneManager::instance().addScene(menuScene);
     SceneManager::instance().addScene(gameScene);
-    SceneManager::instance().activateScene("GameScene");
+    SceneManager::instance().addScene(instructionsScene);
+    
+    SceneManager::instance().activateScene("MenuScene");
     
     Application::run();
     

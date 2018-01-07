@@ -1,6 +1,6 @@
-///////////////////////////////
-/// RAFAEL GONZÁLEZ CARRIZO ///
-///////////////////////////////
+///////////////////////////////////////////
+/// RAFAEL GONZÁLEZ CARRIZO - DIC. 2017 ///
+///////////////////////////////////////////
 
 /// LIBRERÍA PARA CONSULTAR EN TIEMPO REAL EL
 /// ESTADO DE UNA TECLA.
@@ -12,18 +12,20 @@ class Keyboard {
     public:
     
     // No están implementadas todas las teclas.
-    enum Key {Up, Down, Left, Right, Space, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z};
+    enum Key {Up, Down, Left, Right, Space, Escape, Enter, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z};
     
     /*Inicializa los callbacks y el buffer.*/
     static void init();
     
-    /*Funcióne para consultar el teclado. */
+    /*Funciones para consultar el teclado. */
     static bool isKeyPressed(Key key);
+    static bool isKeyPressedNoRepeat(Key key);
     
     protected:
     /// Buffer para almacenar el estado de las teclas.
-    static const unsigned int KEYBOARD_BUFFER_SIZE = 256;
+    static const unsigned int KEYBOARD_BUFFER_SIZE = 64;
     static bool keyState[KEYBOARD_BUFFER_SIZE];
+    static bool prevKeyState[KEYBOARD_BUFFER_SIZE];
     
     static void setSpecialKeyState(int key, bool pressed);
     static void setKeyState(unsigned char k, bool pressed);

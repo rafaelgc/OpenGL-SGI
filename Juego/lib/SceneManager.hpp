@@ -39,7 +39,7 @@ class SceneManager : public Singleton<SceneManager> {
      * @brief Activa la escena especificada y desactiva todas las demás.
      * @param name Nombre de la escena.
      * */
-    void activateSceneAndDeactivateTheRest(std::string name);
+    void switchTo(std::string name);
 
     /**
      * @brief Desactiva la escena especificada en el nombre, si existe.

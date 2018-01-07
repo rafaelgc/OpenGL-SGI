@@ -44,7 +44,7 @@ void planoXY(int resolucion = 10);
    "resolucion" divisiones usando strips horizontales.
    Las normales se generan como (0,0,1)            */
 
-void quad(GLfloat v0[3], GLfloat v1[3], GLfloat v2[3], GLfloat v3[3], int M = 10, int N = 10);
+void quad(GLfloat v0[3], GLfloat v1[3], GLfloat v2[3], GLfloat v3[3], int M = 10, int N = 10, bool wired = false);
 /* v0,v1,v2,v3: vertices del quad
    NxM: resolucion opcional (por defecto 10x10)
    Dibuja el cuadrilatero de entrada con resolucion MxN y normales. 

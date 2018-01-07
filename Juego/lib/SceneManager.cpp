@@ -29,8 +29,6 @@ void SceneManager::addScene(Scene &scene, bool dontAddIfExists) {
 void SceneManager::manage() {
     float dt = (glutGet(GLUT_ELAPSED_TIME) - lastFrameTime) / 1000.0;
     
-    
-
     for (auto it = scenes.begin(); it != scenes.end(); ++it) {
         
         (*it)->advanceTime(dt);
@@ -67,13 +65,19 @@ void SceneManager::activateScene(std::string name) {
     }
 }
 
-void SceneManager::activateSceneAndDeactivateTheRest(std::string name) {
+void SceneManager::switchTo(std::string name) {
     for (auto it = scenes.begin(); it != scenes.end(); ++it) {
         if ((*it)->getName()!=name){
             (*it)->onDeactivate();
         }
     }
     activateScene(name);
+    
+    #ifdef __FREEGLUT_H__
+    if (allScenesInactive()) {
+        glutLeaveMainLoop();
+    }
+    #endif
 }
 
 void SceneManager::deactivateScene(std::string name) {
@@ -81,6 +85,12 @@ void SceneManager::deactivateScene(std::string name) {
     if (scene) {
         scene->onDeactivate();
     }
+    
+    #ifdef __FREEGLUT_H__
+    if (allScenesInactive()) {
+        glutLeaveMainLoop();
+    }
+    #endif
 }
 
 void SceneManager::pauseScene(std::string name) {
@@ -109,6 +119,12 @@ void SceneManager::deactivateAllScenes() {
         
         (*it)->onDeactivate();
     }
+    
+    #ifdef __FREEGLUT_H__
+    if (allScenesInactive()) {
+        glutLeaveMainLoop();
+    }
+    #endif
 }
 
 Scene* SceneManager::lookForScene(std::string name) {

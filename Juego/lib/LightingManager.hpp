@@ -1,38 +1,50 @@
+///////////////////////////////////////////
+/// RAFAEL GONZÁLEZ CARRIZO - DIC. 2017 ///
+///////////////////////////////////////////
+
 #ifndef LIGHTNINGMANAGER_HPP
 #define LIGHTNINGMANAGER_HPP
 
 #include "Light.hpp"
 
 #include <vector>
+#include <queue>
 #include <iostream>
 
 /* Clase auxiliar*/
 class LightState {
     public:
     bool enabled;
-    GLenum light;
-    float distance;
     int lightIndex;
     
-    LightState() { enabled = false; light = 0; distance = -1.f; }
+    LightState() { enabled = false; }
     //LightState(bool enabled) { this->enabled = enabled; this->light = 0; distance = -1.f; }
     
 };
 
-class LightSettings {
+class LightHelper {
     public:
+    Light *light;
     bool updatePosition;
     bool force;
+    float score;
+    
+    bool enabled;
+    GLenum glLight;
+    
+    
     public:
-    LightSettings() { force = false; updatePosition = true; }
-    LightSettings(bool force, bool updatePosition) { this->force = force; this->updatePosition = updatePosition; std::cout << this->updatePosition << std::endl; }
+    LightHelper() { enabled = false; force = false; updatePosition = true; score = 0.0; }
+    LightHelper(bool force, bool updatePosition) { enabled = false; this->force = force; this->updatePosition = updatePosition; }
     bool getUpdatePosition() { return updatePosition; }
 };
 
 class LightingManagerComparator {
     public:
-    bool operator()(LightState & ls1, LightState & ls2) {
-        return true;
+    bool operator ()(LightHelper ls1, LightHelper ls2) {
+        //Cuanto menor sea el score, más visible es la luz
+        //y más interesa que se vea.
+        return ls1.score < ls2.score;
     }
 };
 
@@ -59,7 +71,8 @@ class LightingManager {
     
     float visionDistance;
     //std::vector<std::pair<Light*, LightState>> lights;
-    std::vector<std::pair<Light*, LightSettings>> lights;
+    std::vector<LightHelper> lights;
+    std::queue<GLenum> freeLights;
     
     static const unsigned int MaxLights = 8;
     LightState lightStates[MaxLights];

@@ -1,3 +1,7 @@
+///////////////////////////////////////////
+/// RAFAEL GONZÁLEZ CARRIZO - DIC. 2017 ///
+///////////////////////////////////////////
+
 #ifndef LIGHT_HPP
 #define LIGHT_HPP
 
@@ -11,12 +15,12 @@ class Light {
     Light();
     Light(float x, float y, float z, Type type);
     
-    bool isPositional();
-    bool isDirectional();
+    bool isPositional() const;
+    bool isDirectional() const;
     
-    float getX();
-    float getY();
-    float getZ();
+    float getX() const;
+    float getY() const;
+    float getZ() const;
     
     void setType(Type type);
     void setPosition(float x, float y, float z);
@@ -31,12 +35,16 @@ class Light {
     void update(GLenum light);
     void enable(GLenum light);
     
+    bool needsUpdate() const;
+    void updated();
+    
     protected:
     void setDefaultAttrs();
 
     private:
     GLfloat position[4], ambient[3], diffuse[3], specular[3], direction[3];
     GLfloat cutoff, exponent;
+    bool mNeedsUpdate;
 };
 
 #endif

@@ -61,7 +61,7 @@ void planoXY(int resolucion)
 	delete[] texcoor;
 	delete[] indices;
 }
-void quad(GLfloat v0[3], GLfloat v1[3], GLfloat v2[3], GLfloat v3[3], int M, int N)
+void quad(GLfloat v0[3], GLfloat v1[3], GLfloat v2[3], GLfloat v3[3], int M, int N, bool wired)
 // Dibuja un cuadrilatero con resolucion MxN y fija la normal 
 {
 	if(M<1) M=1; if(N<1) N=1;	// Resolucion minima
@@ -82,7 +82,7 @@ void quad(GLfloat v0[3], GLfloat v1[3], GLfloat v2[3], GLfloat v3[3], int M, int
 			ci[k] = v3[k] + i*(v2[k]-v3[k])/M;
 		}
 		// strip vertical. i=s, j=t
-		glBegin(GL_QUAD_STRIP);
+		glBegin(wired ? GL_LINE_STRIP : GL_QUAD_STRIP);
 		for(int j=0; j<=N; j++){
 			for(int k=0; k<3; k++){
 				// puntos sobre los segmentos b y d

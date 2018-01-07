@@ -1,1 +1,1 @@
-g++ lib/LightingManager.cpp lib/Light.cpp lib/SceneManager.cpp lib/Scene.cpp lib/Keyboard.cpp lib/Application.cpp Utilidades.cpp Point.cpp GameScene.cpp main.cpp -lGL -lglut -lfreeimage -lGLU -o game -std=c++11
+g++ lib/LightingManager.cpp lib/Light.cpp lib/SceneManager.cpp lib/Scene.cpp lib/Keyboard.cpp lib/Application.cpp Utilidades.cpp Point.cpp InstructionsScene.cpp MenuScene.cpp GameScene.cpp main.cpp -lGL -lglut -lfreeimage -lGLU -o game -std=c++11
