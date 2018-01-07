@@ -23,7 +23,7 @@
 using namespace std;
 
 // ATRIBUTOS DE LA VENTANA
-const unsigned int WIDTH = 800, HEIGHT = 600;
+const unsigned int WIDTH = 1024, HEIGHT = 768;
 
 int main(int argc, char** argv) {
 
